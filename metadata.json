@@ -1,0 +1,6 @@
+{
+  "name": "Learning with Mr. Picado",
+  "description": "Plataforma anual interactiva de Inglés para 8.º año con audios, prácticas, lecturas y reportes de notas en tiempo real.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

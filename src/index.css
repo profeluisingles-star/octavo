@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-canvas: #f8faf9;
+    --bg-surface: #ffffff;
+    --bg-subtle: #f1f6f4;
+    --border-hairline: #dde8e3;
+    --text-primary: #102a24;
+    --text-secondary: #435b53;
+    --accent-primary: #17644e;
+    --accent-hover: #124f3d;
+    --accent-soft: #e6f4ee;
+  }
+
+  html {
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-mono-num {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.quiz-no-copy {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .print-clean {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}

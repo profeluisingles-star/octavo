@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style id="access-style">
+*{box-sizing:border-box}body{margin:0;background:#eef6f1;color:#17352d;font:1rem/1.55 system-ui,sans-serif}.access-wrap{max-width:520px;margin:8vh auto;padding:18px}.access-box{background:white;border:1px solid #cbded4;border-radius:20px;padding:clamp(18px,5vw,32px)}h1{font-size:clamp(1.6rem,7vw,2.3rem);line-height:1.15;margin:0 0 12px}.access-box label{display:block;font-weight:750;margin:12px 0 5px}.access-box input,.access-box button{font:inherit;padding:10px 12px;border-radius:9px}.access-box input{width:100%;border:1px solid #74978a}.access-box button{margin-top:10px;background:#17644e;color:white;border:0;font-weight:750}.access-box button:focus-visible,.access-box input:focus-visible{outline:3px solid #a45318;outline-offset:2px}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="access-wrap">
+ <section class="access-box">
+  <h1>Learning with Mr. Picado</h1>
+  <p id="access-status" role="status">Comprobando el acceso en este navegador…</p>
+  <form id="access-form" hidden>
+   <label for="access-code">Código de activación</label>
+   <input id="access-code" type="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" maxlength="48" required>
+   <button id="access-submit" type="submit">Activar el acceso</button>
+  </form>
+ </section>
+</main>
+<script>
+(()=>{
+ const tokenKey='mr-picado-student-session-v1';
+ const $=id=>document.getElementById(id);
+ const form=$('access-form'),field=$('access-code'),submit=$('access-submit'),status=$('access-status');
+ const messages={
+  required:'Escribe el código que te dio el profesor. El acceso quedará activado en este navegador.',
+  invalid:'El código no coincide. Comprueba los caracteres.',
+  used:'Este código ya activó otro navegador. Usa ese navegador o contacta al profesor.',
+  unconfigured:'El profesor todavía tiene que configurar el acceso.'
+ };
+ let token;
+ try{
+  token=localStorage.getItem(tokenKey);
+  if(!/^[a-f0-9]{64}$/.test(token||'')){
+   const bytes=crypto.getRandomValues(new Uint8Array(32));
+   token=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+   localStorage.setItem(tokenKey,token);
+  }
+  if(localStorage.getItem(tokenKey)!==token)throw Error('Storage disabled');
+ }catch{
+  status.textContent='El navegador no pudo guardar el acceso. Abre el enlace en un navegador donde puedas guardar datos del sitio.';
+  return;
+ }
+ function mountStudy(html){
+  const page=new DOMParser().parseFromString(html,'text/html');
+  const scripts=Array.from(page.body.querySelectorAll('script'),script=>{
+   script.remove();
+   return script.textContent;
+  });
+  for(const style of page.head.querySelectorAll('style'))document.head.append(document.importNode(style,true));
+  document.title=page.title;
+  document.documentElement.translate=false;
+  document.documentElement.lang='es';
+  document.documentElement.dataset.classKey=token;
+  $('access-style').remove();
+  document.body.replaceChildren(...Array.from(page.body.childNodes,n=>document.importNode(n,true)));
+  for(const source of scripts){
+   const script=document.createElement('script');
+   script.textContent=source;
+   document.body.append(script);
+  }
+ }
+ function unlock(code){
+  submit.disabled=true;
+  status.textContent='Comprobando el acceso…';
+  google.script.run.withSuccessHandler(result=>{
+   if(result.status==='ok'){mountStudy(result.html);return;}
+   status.textContent=messages[result.status]||'No se pudo comprobar el acceso.';
+   form.hidden=false;submit.disabled=false;
+  }).withFailureHandler(()=>{
+   status.textContent='No se pudo conectar. Vuelve a intentarlo.';
+   form.hidden=false;submit.disabled=false;
+  }).openStudy(token,code);
+ }
+ form.addEventListener('submit',event=>{
+  event.preventDefault();
+  if(field.value.trim())unlock(field.value.trim());
+ });
+ unlock('');
+})();
+</script>
+</body></html>

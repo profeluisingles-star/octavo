@@ -116,7 +116,7 @@ export default function App() {
           }));
           setSyncStatus('Guardado en tiempo real');
         } else {
-          setSyncStatus('Guardado localmente (pendiente de red)');
+          setSyncStatus('Guardado en este dispositivo');
         }
       });
     },

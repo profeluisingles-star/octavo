@@ -84,7 +84,8 @@ export async function postEventToServer(event: GradeEvent): Promise<boolean> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(event),
     });
-    return res.ok;
+    const contentType = res.headers.get('content-type') || '';
+    return res.ok && contentType.includes('application/json');
   } catch {
     return false;
   }
@@ -163,4 +164,35 @@ export function buildGmailHref(state: StudentState, topics: Topic[]): string {
   const text = formatReportText(state, topics);
   const subject = `Avance de Inglés · ${state.student || 'Estudiante'}`;
   return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(TEACHER_EMAIL)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+}
+
+function escapeCsvCell(val: string | number): string {
+  const s = String(val ?? '');
+  if (/[",\n\r]/.test(s)) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+export function buildCsvContent(events: GradeEvent[]): string {
+  const header = ['Fecha', 'Estudiante', 'Evento', 'Actividad', 'Puntaje', 'Puntaje máximo', 'Porcentaje', 'Detalles', 'ID'];
+  const lines = [
+    header.map(escapeCsvCell).join(','),
+    ...events.map((e) =>
+      [
+        new Date(e.timestamp).toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' }),
+        e.student,
+        e.type,
+        e.activity,
+        e.score,
+        e.max,
+        e.max > 0 ? `${e.percentage}%` : '—',
+        e.details ?? '',
+        e.id,
+      ]
+        .map(escapeCsvCell)
+        .join(',')
+    ),
+  ];
+  return '\uFEFF' + lines.join('\r\n');
 }

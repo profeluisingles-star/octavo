@@ -16,6 +16,7 @@ import { topics } from '../data/curriculum';
 import { readingPassages } from '../data/readings';
 import type { GradeEvent, StudentState } from '../types';
 import {
+  buildCsvContent,
   buildGmailHref,
   buildWhatsAppHref,
   formatReportText,
@@ -59,7 +60,8 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
     setLoading(true);
     try {
       const res = await fetch('/api/reports');
-      if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
         const data = (await res.json()) as ReportsPayload;
         setServerData(data);
       }
@@ -84,6 +86,19 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
     } catch {
       // Clipboard fallback unavailable in restricted browser context
     }
+  };
+
+  const handleDownloadCsv = () => {
+    const csv = buildCsvContent(displayedEvents);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reporte-${(state.student || 'mr-picado').toLowerCase().replace(/\s+/g, '-')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   const handleDeleteEvent = async (id: string) => {
@@ -243,14 +258,14 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
             <span>{copiedNotice ? '¡Copiado!' : 'Copiar resumen'}</span>
           </button>
 
-          <a
-            href="/api/reports/csv"
-            download="reporte-mr-picado.csv"
+          <button
+            type="button"
+            onClick={handleDownloadCsv}
             className="inline-flex items-center gap-1.5 rounded-xl border border-[#aac9bd] bg-white px-3.5 py-2 text-xs font-bold text-[#143a30] hover:border-[#17644e]"
           >
             <Download className="h-3.5 w-3.5 text-[#17644e]" aria-hidden="true" />
             <span>Descargar CSV</span>
-          </a>
+          </button>
 
           <button
             type="button"

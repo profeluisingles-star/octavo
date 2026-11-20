@@ -14,6 +14,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AccessGate } from './components/AccessGate';
 import { AnnualRoadmapView } from './components/AnnualRoadmapView';
 import { AssessmentView } from './components/AssessmentView';
 import { GradesAndReportsView } from './components/GradesAndReportsView';
@@ -23,6 +24,7 @@ import { TopicStudyView } from './components/TopicStudyView';
 import { topics } from './data/curriculum';
 import { drawQuestions, idFor, isCorrectAnswer } from './data/questionBanks';
 import type {
+  AccessSession,
   AssessmentMode,
   GradeEventType,
   ReviewItem,
@@ -33,7 +35,9 @@ import {
   buildGmailHref,
   buildGradeEvent,
   buildWhatsAppHref,
+  clearAccessSession,
   isValidStudentName,
+  loadAccessSession,
   loadStudentState,
   MATERIAL_VERSION,
   postEventToServer,
@@ -46,6 +50,7 @@ type PrimaryView = 'roadmap' | 'topics' | 'readings' | 'reports';
 type TopicTab = 'study' | 'verbs' | 'interactive' | 'audio' | 'practice' | 'quiz';
 
 export default function App() {
+  const [accessSession, setAccessSession] = useState<AccessSession | null>(() => loadAccessSession());
   const [state, setState] = useState<StudentState>(() => loadStudentState());
   const [view, setView] = useState<PrimaryView>('topics');
   const [topicIdx, setTopicIdx] = useState<number>(() => {
@@ -123,9 +128,9 @@ export default function App() {
     [persist, state.student]
   );
 
-  // Visit logging once per session when student name exists
+  // Visit logging once per session when access is unlocked and student name exists
   useEffect(() => {
-    if (!state.student) return;
+    if (!accessSession || !state.student) return;
     flushOutbox(state.outbox);
     try {
       if (sessionStorage.getItem(VISIT_SESSION_KEY)) return;
@@ -136,7 +141,7 @@ export default function App() {
     persist((prev) => ({ ...prev, visits: prev.visits + 1 }));
     recordActivity('Visita', 'Entrada a la plataforma', 0, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.student]);
+  }, [accessSession, state.student]);
 
   // Anti-copy guard during active quiz
   useEffect(() => {
@@ -351,6 +356,10 @@ export default function App() {
     { key: 'quiz', label: 'Quiz · 50 pts' },
   ];
 
+  if (!accessSession) {
+    return <AccessGate onUnlocked={(session) => setAccessSession(session)} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#f4f8f6] text-[#102a24]">
       {/* TOP BAR CONTRACT: 1 row, 3 zones (Wordmark | Single-line Nav | 1 Primary Action) */}
@@ -366,8 +375,8 @@ export default function App() {
 
           <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-1 overflow-x-auto">
             {[
-              { id: 'roadmap' as const, label: 'Ruta Anual', icon: Compass },
-              { id: 'topics' as const, label: 'Temas', icon: Sparkles },
+              { id: 'roadmap' as const, label: 'Temario', icon: Compass },
+              { id: 'topics' as const, label: 'Estudio', icon: Sparkles },
               { id: 'readings' as const, label: 'Lecturas', icon: BookOpen },
               { id: 'reports' as const, label: 'Notas y Reportes', icon: BarChart3 },
             ].map((item) => {
@@ -407,8 +416,8 @@ export default function App() {
         {/* Mobile Nav Row */}
         <div className="md:hidden border-t border-[#1c4b3d] px-3 py-2 flex gap-1.5 overflow-x-auto">
           {[
-            { id: 'roadmap' as const, label: 'Ruta Anual' },
-            { id: 'topics' as const, label: 'Temas' },
+            { id: 'roadmap' as const, label: 'Temario' },
+            { id: 'topics' as const, label: 'Estudio' },
             { id: 'readings' as const, label: 'Lecturas' },
             { id: 'reports' as const, label: 'Notas' },
           ].map((item) => (
@@ -436,7 +445,7 @@ export default function App() {
             <form onSubmit={handleProfileSubmit} className="flex flex-wrap items-end gap-3">
               <div className="flex-1 min-w-[240px]">
                 <label htmlFor="student-name-input" className="block text-sm font-bold text-[#102a24] mb-1.5">
-                  Nombre completo del estudiante (Acceso rápido anual)
+                  Nombre completo del estudiante (Acceso rápido)
                 </label>
                 <input
                   id="student-name-input"
@@ -519,6 +528,18 @@ export default function App() {
                 <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Ver Boleta de Notas</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  stopSpeech();
+                  clearAccessSession();
+                  setAccessSession(null);
+                }}
+                className="inline-flex items-center rounded-lg border border-[#d4e4dd] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#435b53] hover:border-rose-300 hover:text-rose-700"
+              >
+                Bloquear acceso
+              </button>
             </div>
           </section>
         )}
@@ -558,6 +579,7 @@ export default function App() {
             <section className="rounded-2xl border border-[#d4e4dd] bg-white p-5 sm:p-7">
               <GradesAndReportsView
                 state={state}
+                accessSession={accessSession}
                 quizLocked={quizLocked}
                 onJumpToTopic={(id) => selectTopic(id, 'study')}
               />
@@ -574,12 +596,12 @@ export default function App() {
                     value={topicSearch}
                     onChange={(e) => setTopicSearch(e.target.value)}
                     placeholder="Buscar tema o regla..."
-                    aria-label="Buscar tema del año"
+                    aria-label="Buscar tema del examen"
                     className="w-full rounded-xl border border-[#d4e4dd] bg-[#f8fbfa] pl-9 pr-3 py-2 text-xs font-medium text-[#102a24] focus-visible:outline-2 focus-visible:outline-[#17644e]"
                   />
                 </div>
 
-                <nav aria-label="Temas del plan anual" className="space-y-1.5">
+                <nav aria-label="Temas del examen" className="space-y-1.5">
                   {filteredTopics.map((t) => {
                     const isCurrent = t.id === topicIdx;
                     const qScore = state.quiz[t.id];
@@ -598,7 +620,7 @@ export default function App() {
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-xs font-mono-num font-bold opacity-80">
-                            U{t.id + 1} · {t.isOriginalConvocatoria ? 'Base' : 'Anual'}
+                            Tema {t.id + 1}
                           </span>
                           {done ? (
                             <CheckCircle2
@@ -659,7 +681,7 @@ export default function App() {
                 {/* Topic Header */}
                 <div className="space-y-1.5">
                   <p className="text-xs font-bold uppercase tracking-wider text-[#17644e]">
-                    Unidad {topicIdx + 1} de {topics.length} · {activeTopic.period}
+                    Tema {topicIdx + 1} de {topics.length} · {activeTopic.period}
                   </p>
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-[#102a24]">
                     {activeTopic.title}
@@ -767,7 +789,7 @@ export default function App() {
           <div className="rounded-2xl border border-[#d4e4dd] bg-white p-8 text-center space-y-2">
             <h2 className="text-xl font-bold text-[#102a24]">Bienvenido a Learning with Mr. Picado</h2>
             <p className="text-sm text-[#435b53]">
-              Ingresa tu nombre arriba para desbloquear el plan anual completo de 8.º año, audios interactivos, prácticas y boleta de notas.
+              Ingresa tu nombre arriba para desbloquear los cinco temas oficiales ampliados, 12 lecturas de comprensión, audios interactivos, prácticas y boleta de notas.
             </p>
           </div>
         )}
@@ -777,7 +799,7 @@ export default function App() {
         <div className="mx-auto max-w-7xl flex flex-wrap items-center justify-between gap-4 text-xs text-[#435b53]">
           <div className="space-y-1">
             <p className="font-bold text-[#102a24]">
-              Learning with Mr. Picado · Inglés 8.º Año (Plan Anual + Primera Convocatoria)
+              Learning with Mr. Picado · Inglés 8.º Año (Temario Oficial Ampliado + Comprensión de Lectura)
             </p>
             <p>
               Docente: Mr. Picado · Correo: {TEACHER_EMAIL} · WhatsApp: +506 8617 9072

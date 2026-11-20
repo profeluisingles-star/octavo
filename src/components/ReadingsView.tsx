@@ -153,8 +153,8 @@ export function ReadingsView({ records, soundEffects, onSaveResult, onBackToTopi
         <div className="inline-flex rounded-xl border border-[#c8dbd3] bg-[#f4f9f6] p-1">
           {[
             ['all', `Todas (${readingPassages.length})`],
-            ['original', 'Convocatoria Base (8)'],
-            ['annual', 'Plan Anual T2–T3 (4)'],
+            ['original', 'Lecturas Base (8)'],
+            ['annual', 'Lecturas Ampliadas (4)'],
           ].map(([key, label]) => (
             <button
               key={key}

@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,6 +38,24 @@ export interface GradeEvent {
 
 interface StorePayload {
   events: GradeEvent[];
+  customCodes?: string[];
+}
+
+function normalizeCode(code: unknown): string {
+  if (typeof code !== 'string') return '';
+  return code.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
+}
+
+function getConfiguredTeacherCode(): string {
+  return (process.env.TEACHER_ACCESS_CODE || 'MP-DOCENTE').trim();
+}
+
+function getEnvStudentCodes(): string[] {
+  const raw = (process.env.STUDENT_ACCESS_CODES || 'MP-EBA64').trim();
+  return raw
+    .split(',')
+    .map((c) => c.trim())
+    .filter(Boolean);
 }
 
 function ensureStore(): StorePayload {
@@ -45,22 +64,28 @@ function ensureStore(): StorePayload {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     if (!fs.existsSync(DATA_FILE)) {
-      const initial: StorePayload = { events: [] };
+      const initial: StorePayload = { events: [], customCodes: [] };
       fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf8');
       return initial;
     }
     const raw = fs.readFileSync(DATA_FILE, 'utf8');
     const parsed = JSON.parse(raw) as StorePayload;
-    return Array.isArray(parsed?.events) ? parsed : { events: [] };
+    return {
+      events: Array.isArray(parsed?.events) ? parsed.events : [],
+      customCodes: Array.isArray(parsed?.customCodes) ? parsed.customCodes : [],
+    };
   } catch {
-    return { events: [] };
+    return { events: [], customCodes: [] };
   }
 }
 
 let memoryStore: StorePayload = ensureStore();
 
 function persistStore(next: StorePayload): void {
-  memoryStore = next;
+  memoryStore = {
+    events: next.events,
+    customCodes: next.customCodes ?? memoryStore.customCodes ?? [],
+  };
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -69,6 +94,20 @@ function persistStore(next: StorePayload): void {
   } catch (err) {
     console.error('Could not persist records:', err);
   }
+}
+
+function getAllValidStudentCodes(): string[] {
+  const combined = [...getEnvStudentCodes(), ...(memoryStore.customCodes || [])];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const c of combined) {
+    const norm = normalizeCode(c);
+    if (norm && !seen.has(norm)) {
+      seen.add(norm);
+      out.push(c.toUpperCase().trim());
+    }
+  }
+  return out;
 }
 
 function normalizeStudentName(name: unknown): string | null {
@@ -90,6 +129,159 @@ const VALID_TYPES = new Set<string>([
   'Verbos',
   'Flashcards',
 ]);
+
+function formatCostaRicaStamp(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' });
+  } catch {
+    return iso;
+  }
+}
+
+function getNotificationConfig() {
+  const teacherEmail = (process.env.TEACHER_EMAIL || 'profeluisingles@gmail.com').trim();
+  const whatsappPhone = (process.env.WHATSAPP_PHONE || '50686179072').replace(/\D/g, '');
+  const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
+  const resendFrom = (process.env.RESEND_FROM || 'Learning with Mr. Picado <onboarding@resend.dev>').trim();
+  const appsScriptUrl = (process.env.APPS_SCRIPT_WEBHOOK_URL || '').trim();
+  const callmebotApiKey = (process.env.CALLMEBOT_APIKEY || '').trim();
+  const notifyWebhookUrl = (process.env.NOTIFY_WEBHOOK_URL || '').trim();
+
+  return {
+    teacherEmail,
+    whatsappPhone,
+    resendApiKey,
+    resendFrom,
+    appsScriptUrl,
+    callmebotApiKey,
+    notifyWebhookUrl,
+  };
+}
+
+async function dispatchNotifications(ev: GradeEvent): Promise<{ delivered: string[]; errors: string[] }> {
+  const cfg = getNotificationConfig();
+  const delivered: string[] = [];
+  const errors: string[] = [];
+
+  const stamp = formatCostaRicaStamp(ev.timestamp);
+  const scoreLine = ev.max > 0 ? `${ev.score}/${ev.max} (${ev.percentage}%)` : 'Registro de acceso';
+  const subject = `Learning with Mr. Picado · ${ev.student} · ${ev.type}`;
+  const plainBody = [
+    'Learning with Mr. Picado — Reporte Automático',
+    `Estudiante: ${ev.student}`,
+    `Fecha (CR): ${stamp}`,
+    `Evento: ${ev.type}`,
+    `Actividad: ${ev.activity}`,
+    `Resultado: ${scoreLine}`,
+    ev.details ? `Detalles: ${ev.details}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const htmlBody = `
+    <div style="font-family:system-ui,sans-serif;max-width:560px;padding:18px;border:1px solid #d4e4dd;border-radius:12px;background:#ffffff;color:#102a24;">
+      <h2 style="margin:0 0 10px;color:#17644e;">Learning with Mr. Picado</h2>
+      <p style="margin:4px 0;"><strong>Estudiante:</strong> ${ev.student}</p>
+      <p style="margin:4px 0;"><strong>Fecha (CR):</strong> ${stamp}</p>
+      <p style="margin:4px 0;"><strong>Evento:</strong> ${ev.type}</p>
+      <p style="margin:4px 0;"><strong>Actividad:</strong> ${ev.activity}</p>
+      <p style="margin:4px 0;"><strong>Resultado:</strong> ${scoreLine}</p>
+      ${ev.details ? `<p style="margin:4px 0;"><strong>Detalles:</strong> ${ev.details}</p>` : ''}
+    </div>
+  `;
+
+  // 1. Resend Email API
+  if (cfg.resendApiKey) {
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${cfg.resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: cfg.resendFrom,
+          to: [cfg.teacherEmail],
+          subject,
+          text: plainBody,
+          html: htmlBody,
+        }),
+      });
+      if (res.ok) {
+        delivered.push('email:resend');
+      } else {
+        errors.push(`resend:${res.status}`);
+      }
+    } catch {
+      errors.push('resend:network');
+    }
+  }
+
+  // 2. Google Apps Script Webhook (sends email via MailApp + logs row)
+  if (cfg.appsScriptUrl) {
+    try {
+      const res = await fetch(cfg.appsScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipient: cfg.teacherEmail,
+          subject,
+          body: plainBody,
+          event: ev,
+        }),
+      });
+      if (res.ok) {
+        delivered.push('email:apps-script');
+      } else {
+        errors.push(`apps-script:${res.status}`);
+      }
+    } catch {
+      errors.push('apps-script:network');
+    }
+  }
+
+  // 3. CallMeBot Free WhatsApp Notification API
+  if (cfg.callmebotApiKey && cfg.whatsappPhone) {
+    try {
+      const waText = `📚 Mr. Picado | ${ev.student}\n• ${ev.type}: ${ev.activity}\n• Resultado: ${scoreLine}\n• ${stamp}`;
+      const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(cfg.whatsappPhone)}&text=${encodeURIComponent(waText)}&apikey=${encodeURIComponent(cfg.callmebotApiKey)}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        delivered.push('whatsapp:callmebot');
+      } else {
+        errors.push(`callmebot:${res.status}`);
+      }
+    } catch {
+      errors.push('callmebot:network');
+    }
+  }
+
+  // 4. Generic Webhook (Make / Zapier / n8n / Telegram)
+  if (cfg.notifyWebhookUrl) {
+    try {
+      const res = await fetch(cfg.notifyWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teacherEmail: cfg.teacherEmail,
+          whatsappPhone: cfg.whatsappPhone,
+          subject,
+          text: plainBody,
+          event: ev,
+        }),
+      });
+      if (res.ok) {
+        delivered.push('webhook');
+      } else {
+        errors.push(`webhook:${res.status}`);
+      }
+    } catch {
+      errors.push('webhook:network');
+    }
+  }
+
+  return { delivered, errors };
+}
 
 function buildStudentSummaries(events: GradeEvent[]) {
   const byStudent = new Map<
@@ -206,6 +398,131 @@ async function startServer() {
     res.json({ ok: true, count: memoryStore.events.length, timestamp: new Date().toISOString() });
   });
 
+  // --- Access Code Verification & Teacher Code Management ---
+  app.post('/api/access/verify', (req: Request, res: Response) => {
+    const input = normalizeCode((req.body as { code?: string })?.code);
+    if (!input) {
+      res.status(400).json({ ok: false, error: 'Escribe un código de acceso válido.' });
+      return;
+    }
+
+    const teacherNorm = normalizeCode(getConfiguredTeacherCode());
+    if (teacherNorm && input === teacherNorm) {
+      res.json({
+        ok: true,
+        role: 'teacher',
+        token: crypto.randomBytes(24).toString('hex'),
+        codeHint: getConfiguredTeacherCode().toUpperCase(),
+      });
+      return;
+    }
+
+    const validCodes = getAllValidStudentCodes();
+    const matched = validCodes.find((c) => normalizeCode(c) === input);
+    if (matched) {
+      res.json({
+        ok: true,
+        role: 'student',
+        token: crypto.randomBytes(24).toString('hex'),
+        codeHint: matched,
+      });
+      return;
+    }
+
+    res.status(401).json({
+      ok: false,
+      error: 'El código no coincide. Verifica los caracteres con Mr. Picado.',
+    });
+  });
+
+  app.post('/api/access/codes', (req: Request, res: Response) => {
+    const body = req.body as { teacherCode?: string; action?: 'list' | 'add' | 'remove'; code?: string };
+    const teacherNorm = normalizeCode(getConfiguredTeacherCode());
+    if (!body?.teacherCode || normalizeCode(body.teacherCode) !== teacherNorm) {
+      res.status(401).json({ ok: false, error: 'Código docente incorrecto.' });
+      return;
+    }
+
+    const action = body.action || 'list';
+    if (action === 'add' && body.code) {
+      const cleaned = body.code.toUpperCase().trim().slice(0, 32);
+      const norm = normalizeCode(cleaned);
+      if (norm.length >= 4 && !getAllValidStudentCodes().some((c) => normalizeCode(c) === norm)) {
+        const nextCustom = [...(memoryStore.customCodes || []), cleaned];
+        persistStore({ events: memoryStore.events, customCodes: nextCustom });
+      }
+    } else if (action === 'remove' && body.code) {
+      const norm = normalizeCode(body.code);
+      const nextCustom = (memoryStore.customCodes || []).filter((c) => normalizeCode(c) !== norm);
+      persistStore({ events: memoryStore.events, customCodes: nextCustom });
+    }
+
+    res.json({
+      ok: true,
+      envCodes: getEnvStudentCodes(),
+      customCodes: memoryStore.customCodes || [],
+      allCodes: getAllValidStudentCodes(),
+    });
+  });
+
+  // --- Notification Channel Status & Live Test ---
+  app.get('/api/notifications/status', (_req: Request, res: Response) => {
+    const cfg = getNotificationConfig();
+    res.json({
+      teacherEmail: cfg.teacherEmail,
+      whatsappPhone: cfg.whatsappPhone,
+      emailAutomatic: Boolean(cfg.resendApiKey || cfg.appsScriptUrl),
+      emailProviders: {
+        resend: Boolean(cfg.resendApiKey),
+        appsScript: Boolean(cfg.appsScriptUrl),
+      },
+      whatsappAutomatic: Boolean(cfg.callmebotApiKey),
+      whatsappProviders: {
+        callmebot: Boolean(cfg.callmebotApiKey),
+      },
+      webhookAutomatic: Boolean(cfg.notifyWebhookUrl),
+      activeStudentCodesCount: getAllValidStudentCodes().length,
+    });
+  });
+
+  app.post('/api/notifications/test', async (req: Request, res: Response) => {
+    const body = req.body as { teacherCode?: string };
+    const teacherNorm = normalizeCode(getConfiguredTeacherCode());
+    if (!body?.teacherCode || normalizeCode(body.teacherCode) !== teacherNorm) {
+      res.status(401).json({ ok: false, error: 'Código docente incorrecto para enviar pruebas.' });
+      return;
+    }
+
+    const sampleEvent: GradeEvent = {
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      student: 'Prueba del Sistema (Mr. Picado)',
+      type: 'Quiz',
+      activity: 'Present Simple (Prueba)',
+      score: 48,
+      max: 50,
+      percentage: 96,
+      details: 'Verificación de envío automático a correo y WhatsApp',
+    };
+
+    const result = await dispatchNotifications(sampleEvent);
+    if (result.delivered.length === 0) {
+      res.json({
+        ok: false,
+        channels: [],
+        message:
+          'No hay un proveedor automático configurado todavía (RESEND_API_KEY, APPS_SCRIPT_WEBHOOK_URL o CALLMEBOT_APIKEY). Revisa las instrucciones en pantalla para activarlo gratis.',
+      });
+      return;
+    }
+
+    res.json({
+      ok: true,
+      channels: result.delivered,
+      message: `Prueba enviada correctamente por: ${result.delivered.join(', ')}`,
+    });
+  });
+
   app.get('/api/reports', (req: Request, res: Response) => {
     const studentQuery = typeof req.query.student === 'string' ? req.query.student.trim() : '';
     const allEvents = [...memoryStore.events].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
@@ -221,7 +538,7 @@ async function startServer() {
     });
   });
 
-  app.post('/api/events', (req: Request, res: Response) => {
+  app.post('/api/events', async (req: Request, res: Response) => {
     const body = req.body as Partial<GradeEvent>;
     const student = normalizeStudentName(body.student);
     if (!student) {
@@ -266,7 +583,13 @@ async function startServer() {
     };
 
     persistStore({ events: [event, ...memoryStore.events].slice(0, 3000) });
-    res.status(201).json({ ok: true, event, totalEvents: memoryStore.events.length });
+    const notifications = await dispatchNotifications(event);
+    res.status(201).json({
+      ok: true,
+      event,
+      totalEvents: memoryStore.events.length,
+      notifications,
+    });
   });
 
   app.get('/api/reports/csv', (req: Request, res: Response) => {
@@ -279,7 +602,7 @@ async function startServer() {
       header.map(escapeCsvCell).join(','),
       ...rows.map((e) =>
         [
-          new Date(e.timestamp).toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' }),
+          formatCostaRicaStamp(e.timestamp),
           e.student,
           e.type,
           e.activity,

@@ -117,7 +117,7 @@ export function buildGradeEvent(
 
 export function formatReportText(state: StudentState, topics: Topic[]): string {
   const lines: string[] = [
-    'Avance de Inglés · Learning with Mr. Picado (Plan Anual)',
+    'Avance de Inglés · Learning with Mr. Picado (Temario Oficial Ampliado)',
     `Estudiante: ${state.student || 'Sin registrar'}`,
     `Visitas registradas: ${state.visits}`,
     '',
@@ -196,3 +196,102 @@ export function buildCsvContent(events: GradeEvent[]): string {
   ];
   return '\uFEFF' + lines.join('\r\n');
 }
+
+export const ACCESS_SESSION_KEY = 'mr-picado-access-session-v1';
+
+export function normalizeAccessCode(code: string): string {
+  return code.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
+}
+
+export function generateMpCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let suffix = '';
+  for (let i = 0; i < 5; i += 1) {
+    suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `MP-${suffix}`;
+}
+
+export function loadAccessSession(): import('../types').AccessSession | null {
+  try {
+    const raw = localStorage.getItem(ACCESS_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as import('../types').AccessSession;
+    if (!parsed?.token || (parsed.role !== 'student' && parsed.role !== 'teacher')) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function saveAccessSession(session: import('../types').AccessSession): boolean {
+  try {
+    localStorage.setItem(ACCESS_SESSION_KEY, JSON.stringify(session));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function clearAccessSession(): void {
+  try {
+    localStorage.removeItem(ACCESS_SESSION_KEY);
+  } catch {
+    // Ignore storage restriction
+  }
+}
+
+export async function verifyAccessCodeOnServer(
+  code: string
+): Promise<{ ok: boolean; role?: 'student' | 'teacher'; token?: string; codeHint?: string; error?: string }> {
+  try {
+    const res = await fetch('/api/access/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      return { ok: false, error: 'El servidor no respondió en formato válido.' };
+    }
+    const data = await res.json();
+    if (!res.ok) {
+      return { ok: false, error: data?.error || 'Código inválido.' };
+    }
+    return data;
+  } catch {
+    return { ok: false, error: 'No se pudo conectar con el servidor de verificación.' };
+  }
+}
+
+export async function fetchNotificationStatus(): Promise<import('../types').NotificationChannelStatus | null> {
+  try {
+    const res = await fetch('/api/notifications/status');
+    if (!res.ok) return null;
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) return null;
+    return (await res.json()) as import('../types').NotificationChannelStatus;
+  } catch {
+    return null;
+  }
+}
+
+export async function sendTestNotification(
+  teacherCode: string
+): Promise<{ ok: boolean; channels: string[]; message: string }> {
+  try {
+    const res = await fetch('/api/notifications/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ teacherCode }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { ok: false, channels: [], message: data?.error || 'No se pudo enviar la prueba.' };
+    }
+    return data;
+  } catch {
+    return { ok: false, channels: [], message: 'Error de conexión al enviar prueba.' };
+  }
+}
+

@@ -1,4 +1,4 @@
-export type TopicPeriod = 'Trimestre 1 · Convocatoria Base' | 'Trimestre 2 · Ampliación Anual' | 'Trimestre 3 · Consolidación Anual';
+export type TopicPeriod = string;
 
 export interface Topic {
   id: number;
@@ -185,3 +185,27 @@ export interface StudentState {
   localHistory: GradeEvent[];
   soundEffects: boolean;
 }
+
+export interface AccessSession {
+  token: string;
+  role: 'student' | 'teacher';
+  codeHint: string;
+  activatedAt: string;
+}
+
+export interface NotificationChannelStatus {
+  teacherEmail: string;
+  whatsappPhone: string;
+  emailAutomatic: boolean;
+  emailProviders: {
+    resend: boolean;
+    appsScript: boolean;
+  };
+  whatsappAutomatic: boolean;
+  whatsappProviders: {
+    callmebot: boolean;
+  };
+  webhookAutomatic: boolean;
+  activeStudentCodesCount: number;
+}
+

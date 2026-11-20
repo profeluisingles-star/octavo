@@ -14,13 +14,14 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { topics } from '../data/curriculum';
 import { readingPassages } from '../data/readings';
-import type { GradeEvent, StudentState } from '../types';
+import type { AccessSession, GradeEvent, StudentState } from '../types';
 import {
   buildCsvContent,
   buildGmailHref,
   buildWhatsAppHref,
   formatReportText,
 } from '../utils/storage';
+import { TeacherControlPanel } from './TeacherControlPanel';
 
 interface StudentServerSummary {
   student: string;
@@ -44,11 +45,12 @@ interface ReportsPayload {
 
 interface GradesAndReportsViewProps {
   state: StudentState;
+  accessSession: AccessSession;
   quizLocked: boolean;
   onJumpToTopic: (topicId: number) => void;
 }
 
-export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: GradesAndReportsViewProps) {
+export function GradesAndReportsView({ state, accessSession, quizLocked, onJumpToTopic }: GradesAndReportsViewProps) {
   const [subView, setSubView] = useState<'student' | 'realtime'>('student');
   const [serverData, setServerData] = useState<ReportsPayload | null>(null);
   const [loading, setLoading] = useState(false);
@@ -147,7 +149,7 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
         <div>
           <h2 className="text-2xl font-extrabold text-[#102a24]">Notas y Reportes en Tiempo Real</h2>
           <p className="text-sm text-[#435b53]">
-            Visualización clara de calificaciones, progreso anual y registro en vivo para estudiante y docente.
+            Visualización clara de calificaciones, progreso por tema y registro en vivo para estudiante y docente.
           </p>
         </div>
 
@@ -186,7 +188,7 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
           <p className="text-3xl font-extrabold font-mono-num text-[#102a24] mt-1">
             {quizzesPassed} / {topics.length}
           </p>
-          <p className="text-xs text-[#435b53] mt-1">Base convocatoria: {unitScores.slice(0, 5).filter((u) => (u.q ?? 0) >= 46).length}/5</p>
+          <p className="text-xs text-[#435b53] mt-1">Meta de dominio: 46 pts o más</p>
         </div>
         <div className="rounded-xl border border-[#d4e4dd] bg-white p-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[#435b53]">Prácticas Completadas</p>
@@ -297,12 +299,12 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
             </div>
 
             <div className="overflow-x-auto">
-              <svg viewBox="0 0 760 210" className="w-full min-w-[540px] h-auto" role="img" aria-label="Gráfico de notas por unidad">
+              <svg viewBox="0 0 540 210" className="w-full min-w-[440px] h-auto" role="img" aria-label="Gráfico de notas por tema">
                 {[0, 25, 50, 75, 100].map((val) => {
                   const y = 170 - val * 1.4;
                   return (
                     <g key={val}>
-                      <line x1="42" y1={y} x2="740" y2={y} stroke="#e6efeb" strokeWidth="1" />
+                      <line x1="42" y1={y} x2="515" y2={y} stroke="#e6efeb" strokeWidth="1" />
                       <text x="34" y={y + 4} textAnchor="end" fontSize="10" fill="#435b53" className="font-mono-num">
                         {val}%
                       </text>
@@ -310,7 +312,7 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
                   );
                 })}
                 {unitScores.map((u, idx) => {
-                  const groupX = 62 + idx * 85;
+                  const groupX = 72 + idx * 88;
                   const pH = ((u.pPct ?? 0) / 100) * 140;
                   const qH = ((u.qPct ?? 0) / 100) * 140;
                   return (
@@ -318,7 +320,7 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
                       <rect x={groupX} y={170 - pH} width="22" height={Math.max(pH, 2)} rx="4" fill="#8bc5b1" />
                       <rect x={groupX + 26} y={170 - qH} width="22" height={Math.max(qH, 2)} rx="4" fill="#17644e" />
                       <text x={groupX + 24} y="190" textAnchor="middle" fontSize="11" fontWeight="700" fill="#102a24">
-                        U{idx + 1}
+                        Tema {idx + 1}
                       </text>
                       {(u.qPct !== null || u.pPct !== null) && (
                         <text
@@ -344,7 +346,7 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
           <section className="overflow-x-auto rounded-xl border border-[#d4e4dd] bg-white">
             <table className="w-full text-left text-sm border-collapse">
               <caption className="px-4 py-3 text-left font-extrabold text-[#102a24] bg-[#f4f9f6] border-b border-[#d4e4dd]">
-                Matriz Detallada de Calificaciones (Plan Anual)
+                Matriz Detallada de Calificaciones
               </caption>
               <thead>
                 <tr className="bg-[#e6f4ee] text-[#102a24]">
@@ -456,6 +458,8 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
       ) : (
         /* REAL-TIME TEACHER MANAGEMENT VIEW */
         <div className="space-y-6">
+          <TeacherControlPanel accessSession={accessSession} />
+
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#d4e4dd] bg-white p-4">
             <div className="flex flex-wrap items-center gap-3">
               <label htmlFor="student-filter" className="text-xs font-bold text-[#435b53]">

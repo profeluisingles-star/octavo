@@ -1,5 +1,5 @@
 import type { AssessmentMode, Question } from '../types';
-import { verbForms } from './curriculum';
+import { extraYearVerbs, verbForms } from './curriculum';
 import { costaRicaText, gymText, holidaysText, schoolComprehension, schoolLifeText, sportsText } from './readings';
 
 export function normalized(input: string): string {
@@ -16,7 +16,6 @@ export function normalized(input: string): string {
     .replace(/\bis not\b/g, "isn't")
     .replace(/\bisn't\b/g, 'is not')
     .replace(/\baren't\b/g, 'are not')
-    .replace(/\bwill not\b/g, "won't")
     .replace(/\bI'm\b/gi, 'i am');
 }
 
@@ -288,6 +287,8 @@ const presentQuestions: Question[] = subjectPeople
     written('Who ___ a speech at assembly? (give)', 'gives', 'Who funciona como sujeto. Por eso give cambia a gives.', { answerMode: 'blank', complete: 'Who gives a speech at assembly?' }),
     written('Does Paul ___ five classes a day? (attend)', 'attend', 'Con does se usa attend, en forma base.', { answerMode: 'blank', complete: 'Does Paul attend five classes a day?' }),
     written('Where do the students ___ after the assembly? (go)', 'go', 'Where pide lugar. Después de do, go queda en su forma base.', { answerMode: 'blank', complete: 'Where do the students go after the assembly?' }),
+    written('Does Sarah ___ novels in the library? (read)', 'read', 'Con Does al inicio, read queda en su forma base.', { answerMode: 'blank', complete: 'Does Sarah read novels in the library?' }),
+    written('Do your classmates ___ notes every day? (take)', 'take', 'Después de Do, el verbo vuelve a su forma base take.', { answerMode: 'blank', complete: 'Do your classmates take notes every day?' }),
   ]);
 
 const bePatterns: [string, string, string][] = [
@@ -450,9 +451,30 @@ const pastTasks = verbForms.flatMap(({ base, past, es, pastAlternatives = [] }, 
   })
 );
 
-const pastAffirm: Question[] = pastTasks.map((t) => t[0]).concat(exactPast8.filter((t) => !t.correct.startsWith('did not ')));
-const pastNegative: Question[] = pastTasks.map((t) => t[1]).concat(exactPast8.filter((t) => t.correct.startsWith('did not ')));
-const pastQuestions: Question[] = pastTasks.map((t) => t[2]);
+// Also generate Past Simple tasks using the 6 extra verbs (+, -, ?) mirrored cleanly from Present Simple
+const extraPastTasks = extraYearVerbs.map((v, i) => {
+  const subjects = ['The students', 'She', 'Our teacher', 'Daniel', 'My family', 'Elena'];
+  const who = subjects[i % subjects.length];
+  return {
+    affirm: gapWithVerb(who, v.then, v.base, v.past, v.rule, { cueBefore: true }),
+    negative: gapWithVerb(who, v.then, v.base, `did not ${v.base}`, `Did not marca pasado; el verbo vuelve a su forma base ${v.base}.`, { negative: true, cueBefore: true }),
+    question: transformQuestion(who, v.then, v.base, 'Did'),
+  };
+});
+
+const pastAffirm: Question[] = pastTasks
+  .map((t) => t[0])
+  .concat(exactPast8.filter((t) => !t.correct.startsWith('did not ')))
+  .concat(extraPastTasks.map((t) => t.affirm));
+
+const pastNegative: Question[] = pastTasks
+  .map((t) => t[1])
+  .concat(exactPast8.filter((t) => t.correct.startsWith('did not ')))
+  .concat(extraPastTasks.map((t) => t.negative));
+
+const pastQuestions: Question[] = pastTasks
+  .map((t) => t[2])
+  .concat(extraPastTasks.map((t) => t.question));
 
 const sportBank: Question[] = (
   [
@@ -569,135 +591,13 @@ const holidayReading: Question[] = fullSentenceQuestions(holidayAnswers, holiday
   fullSentenceQuestions(localAnswers, costaRicaText, 'Two Celebrations in Costa Rica')
 );
 
-// --- FULL-YEAR EXPANSION BANKS (Units 5, 6, 7) ---
-
-// Unit 5: Daily Routines, Frequency Adverbs & Time
-const routineChoiceBank: Question[] = [
-  make('Daniel ___ wakes up at 6:00 a.m. (100% of the time)', 'always', ['never', 'rarely'], '100% de frecuencia corresponde a always.'),
-  make('Our teacher ___ late for assembly. (0% with verb be)', 'is never', ['never is', 'does never'], 'Con el verbo be (is), el adverbio va después: is never.'),
-  make('How ___ do you practice English? Twice a week.', 'often', ['many', 'time'], 'La pregunta de frecuencia es How often.'),
-  make('It is 7:15. What time is it?', 'A quarter past seven', ['A quarter to seven', 'Half past seven'], '15 minutos después de la hora es a quarter past.'),
-  make('It is 10:30. What time is it?', 'Half past ten', ['Ten o’clock', 'A quarter to ten'], '30 minutos es half past.'),
-  make('It is 6:45. What time is it?', 'A quarter to seven', ['A quarter past six', 'Half past six'], 'Faltan 15 minutos para las siete: a quarter to seven.'),
-  make('She ___ listens to English songs in the evening. (80%)', 'usually', ['never', 'seldom'], '80% de frecuencia equivale a usually.'),
-  make('We ___ play board games if it rains. (40%)', 'sometimes', ['always', 'never'], '40% equivale a sometimes.'),
-  make('Classes are ___ interesting in Music. (100%)', 'always', ['rarely', 'never'], 'Always va después de are.'),
-  make('He ___ misses Art class because he loves painting. (0%)', 'never', ['often', 'usually'], '0% equivale a never.'),
-  make('What does “twice a week” mean?', 'Dos veces por semana', ['Todos los días', 'Una vez al mes'], 'Once = 1 vez; twice = 2 veces.'),
-  make('The school bell rings at 7:00.', 'Seven o’clock', ['Half past seven', 'A quarter past seven'], 'Las horas exactas terminan en o’clock.'),
-  make('They ___ study in the library on Tuesdays. (60%)', 'often', ['never', 'rarely'], 'Often expresa alta frecuencia habitual.'),
-  make('My friends ___ happy on Fridays.', 'are usually', ['usually are', 'do usually'], 'Con are (be), usually va después de are.'),
-  make('It is 12:00 p.m. in the middle of the day.', 'At noon', ['At midnight', 'A quarter to twelve'], 'El mediodía se dice noon.'),
-  make('We ___ forget our homework because we check our agenda. (0%)', 'never', ['always', 'often'], 'Si siempre revisan la agenda, nunca la olvidan (never).'),
-  make('The afternoon break begins at 2:15.', 'A quarter past two', ['Half past two', 'Two o’clock'], '2:15 = a quarter past two.'),
-  make('Ana practices guitar ___ a day.', 'once', ['one', 'first'], 'Una vez se dice once.'),
-  make('Science club meets at 3:45.', 'A quarter to four', ['A quarter past three', 'Half past four'], '3:45 = faltan 15 para las 4 (a quarter to four).'),
-  make('Students ___ wear their uniform neatly.', 'usually', ['yesterday', 'tomorrow'], 'Usually describe una rutina escolar.'),
-];
-
-const routineWriteBank: Question[] = [
-  written('Mateo ___ (always / arrive) before seven o’clock.', 'always arrives', 'Always va antes del verbo. Mateo (he) agrega -s: always arrives.', { answerMode: 'blank' }),
-  written('Music class ___ (never / be) boring.', 'is never', 'Con el verbo be (is), never va después: is never.', { answerMode: 'blank' }),
-  written('Escribe la hora en palabras: 8:00 → eight ___.', 'o’clock', 'Las horas en punto usan o’clock.', { alternatives: ["o'clock"] }),
-  written('Escribe la hora en palabras: 9:30 → ___ past nine.', 'half', '9:30 se dice half past nine.'),
-  written('Escribe la hora en palabras: 5:15 → a ___ past five.', 'quarter', 'Y cuarto es a quarter past.'),
-  written('We ___ (usually / clean) the classroom on Fridays.', 'usually clean', 'Usually va antes del verbo base clean con we.', { answerMode: 'blank' }),
-  written('I ___ (sometimes / read) novels at night.', 'sometimes read', 'Con I, el verbo read queda en forma base.', { answerMode: 'blank' }),
-  written('She ___ (often / practice) her speech.', 'often practices', 'She agrega -s a practice → practices.', { answerMode: 'blank' }),
-  written('The library ___ (always / be) quiet in the morning.', 'is always', 'Is siempre precede al adverbio de frecuencia.', { answerMode: 'blank' }),
-  written('How ___ do you study English? Every day!', 'often', 'How often pregunta por frecuencia.', { answerMode: 'blank' }),
-  written('They ___ (rarely / miss) Physical Education.', 'rarely miss', 'Con they, miss queda en forma base.', { answerMode: 'blank' }),
-  written('Escribe la hora: 3:45 → a quarter ___ four.', 'to', 'Un cuarto para las cuatro usa to.'),
-];
-
-// Unit 6: Future Plans & Costa Rican Places
-const futureChoiceBank: Question[] = [
-  make('Next weekend, we ___ visit Arenal Volcano.', 'are going to', ['is going to', 'going to'], 'Con we se usa are going to + verbo base.'),
-  make('Elena ___ going to travel to Nicoya in July.', 'is', ['are', 'am'], 'Elena equivale a she, por eso usa is.'),
-  make('Look at those dark clouds! It ___ rain soon.', 'is going to', ['was going to', 'are going to'], 'Predicción con evidencia presente o plan usa is going to con it.'),
-  make('I think our team ___ win the tournament.', 'will', ['going to', 'is'], 'Con I think (opinión/predicción) se usa will + verbo base.'),
-  make('They ___ cancel the assembly tomorrow. (will negative)', 'won’t', ['not will', 'don’t will'], 'La forma negativa de will es will not o won’t.'),
-  make('Where can you see volcanoes and trails?', 'In a national park', ['In a bus station', 'In a supermarket'], 'Los volcanes y senderos están en un national park.'),
-  make('“Turn left at the corner” means:', 'Dobla a la izquierda en la esquina', ['Sigue directo', 'Cruza el puente'], 'Turn left = doblar a la izquierda.'),
-  make('“Go straight for two blocks” means:', 'Sigue directo dos cuadras', ['Dobla a la derecha', 'Regresa al parque'], 'Go straight = seguir directo.'),
-  make('I ___ going to finish my Science project tonight.', 'am', ['is', 'are'], 'Con I siempre se usa am going to.'),
-  make('___ you going to pack a rain jacket?', 'Are', ['Is', 'Do'], 'Las preguntas con going to usan Am/Is/Are al principio.'),
-  make('Tortuguero and Manuel Antonio are famous ___.', 'national parks', ['classrooms', 'libraries'], 'Son parques nacionales de Costa Rica.'),
-  make('If you cross the rainforest trail, look at the ___ bridge.', 'suspension', ['equation', 'envelope'], 'Suspension bridge significa puente colgante.'),
-  make('Carlos won’t ___ late for the bus.', 'arrive', ['arrives', 'arrived'], 'Después de will o won’t va el verbo en forma base.'),
-  make('We are going to ___ traditional food in Guanacaste.', 'eat', ['ate', 'eating'], 'Después de going to se usa el verbo base eat.'),
-  make('She ___ going to buy tickets tomorrow.', 'isn’t', ['aren’t', 'doesn’t'], 'Con she, la negativa es is not / isn’t.'),
-  make('Which word means “sendero”?', 'trail', ['library', 'museum'], 'Trail significa sendero.'),
-  make('Which place is best for swimming and waves?', 'The beach', ['The volcano', 'The gym'], 'Beach significa playa.'),
-  make('Will they travel by bus? Yes, they ___.', 'will', ['are', 'do'], 'Si la pregunta empieza con Will, la respuesta corta usa will.'),
-  make('I forgot my umbrella. Wait, I ___ lend you mine.', 'will', ['going to', 'am'], 'Una decisión espontánea en el momento usa will.'),
-  make('Where do travelers catch buses to Limón?', 'At the bus station', ['In the schoolyard', 'At the museum'], 'Bus station = estación de autobuses.'),
-];
-
-const futureWriteBank: Question[] = [
-  written('Our family ___ (be / going to / travel) to Manuel Antonio next month.', 'is going to travel', 'Family es singular → is going to travel.', { answerMode: 'blank', alternatives: ['are going to travel'] }),
-  written('I ___ (be / going to / study) History tonight.', 'am going to study', 'Con I usa am going to + verbo base.', { answerMode: 'blank' }),
-  written('They ___ (not / be / going to / play) outside in the rain.', 'are not going to play', 'Con they usa are not (aren’t) going to play.', { answerMode: 'blank', alternatives: ["aren't going to play"] }),
-  written('She ___ (will / bring) cookies for the festival.', 'will bring', 'Will siempre va con el verbo en forma base.', { answerMode: 'blank' }),
-  written('We ___ (not / will / forget) our passports.', 'will not forget', 'Negación con will: will not o won’t + forget.', { answerMode: 'blank', alternatives: ["won't forget"] }),
-  written('___ you going to visit Cartago on Sunday? (Be)', 'Are', 'Pregunta para you empieza con Are.', { answerMode: 'blank' }),
-  written('The students ___ (be / going to / pack) rain jackets.', 'are going to pack', 'Students (plural) usa are going to pack.', { answerMode: 'blank' }),
-  written('It ___ (will / be) sunny in Guanacaste tomorrow.', 'will be', 'Después de will se mantiene be en forma base.', { answerMode: 'blank' }),
-  written('Reescribe como pregunta: He is going to read the map.', 'Is he going to read the map?', 'Coloca Is al inicio de la pregunta.', { answerMode: 'question' }),
-  written('Reescribe en negativo: We will arrive late.', 'We will not arrive late.', 'Agrega not después de will (o usa won’t).', { alternatives: ["We won't arrive late."] }),
-  written('He ___ (not / be / going to / buy) expensive souvenirs.', 'is not going to buy', 'He usa is not (isn’t) going to buy.', { answerMode: 'blank', alternatives: ["isn't going to buy"] }),
-  written('___ she will join the drama club? No, write the question cleanly: ___ she join the club? (will)', 'Will', 'Las preguntas con will colocan Will antes del sujeto.', { answerMode: 'blank' }),
-];
-
-// Unit 7: Past Continuous & Comparisons
-const pastContCompChoiceBank: Question[] = [
-  make('While Sofía ___ in the library, Daniel found an article.', 'was reading', ['were reading', 'read'], 'Sofía (singular) en progreso usa was + -ing.'),
-  make('The students ___ notes when the principal walked in.', 'were taking', ['was taking', 'are taking'], 'The students (plural) en pasado continuo usa were taking.'),
-  make('Soccer is ___ than table tennis in Costa Rica.', 'more popular', ['most popular', 'popularer'], 'Adjetivo largo (popular) con than usa more popular.'),
-  make('Math is ___ for me than Chemistry.', 'easier', ['more easy', 'easiest'], 'Easy termina en consonante + y → easier than.'),
-  make('Chirripó is the ___ mountain in Costa Rica.', 'highest', ['higher', 'most high'], 'Superlativo de adjetivo corto (high): the highest.'),
-  make('English is the ___ subject for my group!', 'best', ['goodest', 'better'], 'Superlativo irregular de good: the best.'),
-  make('A train is usually ___ than a bicycle.', 'faster', ['more fast', 'fastest'], 'Comparativo corto de fast: faster than.'),
-  make('That movie was the ___ of the year.', 'most exciting', ['more exciting', 'excitingest'], 'Superlativo de adjetivo largo: the most exciting.'),
-  make('Yesterday’s storm was ___ than last week’s rain.', 'worse', ['badder', 'worst'], 'Comparativo irregular de bad: worse than.'),
-  make('I ___ studying when the lights went out.', 'was', ['were', 'am'], 'Con I en pasado continuo se usa was.'),
-  make('While we were ___ soccer, it started to rain.', 'playing', ['played', 'play'], 'Después de were en Past Continuous va el verbo en -ing.'),
-  make('Which connector introduces the long action in progress?', 'while', ['than', 'because'], 'While acompaña a was/were + -ing.'),
-  make('Cartago is ___ than Liberia in December.', 'colder', ['coldest', 'more cold'], 'Comparativo corto: colder than.'),
-  make('She was ___ a story in her notebook.', 'writing', ['wrote', 'writeing'], 'Write pierde la -e final para formar writing.'),
-  make('Swimming is healthier ___ watching TV all day.', 'than', ['that', 'then'], 'Las comparaciones usan than.'),
-  make('Biology is ___ interesting than I expected.', 'more', ['most', 'very'], 'More + adjetivo + than.'),
-  make('What ___ you doing at eight o’clock last night?', 'were', ['was', 'did'], 'Con you se usa were en Past Continuous.'),
-  make('Who is the ___ runner on the track team?', 'fastest', ['faster', 'more fast'], 'The + adjetivo + -est para superlativo.'),
-  make('We weren’t ___ at home yesterday afternoon.', 'staying', ['stayed', 'stay'], 'Negación de Past Continuous: weren’t + staying.'),
-  make('Costa Rica’s beaches are among the ___ beautiful in Central America.', 'most', ['more', 'best'], 'The most + adjetivo largo.'),
-];
-
-const pastContCompWriteBank: Question[] = [
-  written('Valeria ___ (write) in her notebook when grandma arrived.', 'was writing', 'Acción en progreso singular: was writing.', { answerMode: 'blank' }),
-  written('My classmates ___ (practice) the dance at 3:00 yesterday.', 'were practicing', 'Plural + momento pasado en progreso: were practicing.', { answerMode: 'blank' }),
-  written('Tamarindo is ___ (quiet) than Puntarenas in the morning.', 'quieter', 'Comparativo corto de quiet: quieter.', { answerMode: 'blank' }),
-  written('The library is the ___ (good) place to read quietly.', 'best', 'Superlativo irregular de good: best.', { answerMode: 'blank' }),
-  written('Geography is ___ (easy) for Daniel than Physics.', 'easier', 'Easy → easier en comparativo.', { answerMode: 'blank' }),
-  written('Basketball is ___ (exciting) than walking on a treadmill. (more)', 'more exciting', 'Adjetivo largo: more exciting.', { answerMode: 'blank' }),
-  written('I ___ (not / sleep) at nine o’clock last night.', 'was not sleeping', 'Con I en negativo: was not (wasn’t) sleeping.', { answerMode: 'blank', alternatives: ["wasn't sleeping"] }),
-  written('They ___ (watch) the parade when the rain began.', 'were watching', 'Plural: were watching.', { answerMode: 'blank' }),
-  written('That exam was the ___ (difficult) test of the trimester.', 'most difficult', 'Superlativo largo: (the) most difficult.', { answerMode: 'blank' }),
-  written('Yesterday was ___ (hot) than Monday.', 'hotter', 'Hot duplica la t final: hotter.', { answerMode: 'blank' }),
-  written('He ___ (fix) the computer while she was printing articles.', 'was fixing', 'Singular en progreso: was fixing.', { answerMode: 'blank' }),
-  written('My grades this trimester are ___ (good) than last trimester.', 'better', 'Comparativo irregular de good: better.', { answerMode: 'blank' }),
-];
-
-// Master banks and cuts per topic index (0..7)
+// Master banks and cuts strictly for the 5 Exam Topics (0..4)
 export const bankForLearning: Question[][][] = [
   [schoolMatch, schoolReverse],
   [presentAffirm, presentNegative, presentQuestions, presentBe, schoolReading],
   [timeBank, timePaired],
   [modalBank],
   [pastAffirm, pastNegative, pastQuestions, sportBank, holidayWordQuestions, holidayReading],
-  [routineChoiceBank, routineWriteBank],
-  [futureChoiceBank, futureWriteBank],
-  [pastContCompChoiceBank, pastContCompWriteBank],
 ];
 
 export const bankCuts: Record<AssessmentMode, number[][]> = {
@@ -707,9 +607,6 @@ export const bankCuts: Record<AssessmentMode, number[][]> = {
     [26, 4],
     [30],
     [6, 4, 3, 7, 5, 5],
-    [18, 12],
-    [18, 12],
-    [18, 12],
   ],
   quiz: [
     [15, 10],
@@ -717,9 +614,6 @@ export const bankCuts: Record<AssessmentMode, number[][]> = {
     [21, 4],
     [25],
     [5, 4, 3, 5, 4, 4],
-    [15, 10],
-    [15, 10],
-    [15, 10],
   ],
 };
 
@@ -833,12 +727,38 @@ export const verbSetsByTopic: Record<number, VerbDrillSet[]> = {
       intro: 'Escribe la pregunta completa con Does y el verbo base.',
       items: verbForms.map((v) => transformQuestion('She', v.present, v.base, 'Does')),
     },
+    {
+      label: 'Serie mixta · Completar oraciones en Present Simple',
+      intro: 'Practica afirmativas, negativas y preguntas combinadas usando los verbos escolares.',
+      items: [
+        gapWithVerb('Mateo', 'Math and History in the morning', 'study', 'studies', 'Mateo (he) en presente agrega -ies → studies.'),
+        gapWithVerb('The students', 'novels before lunch', 'read', 'do not read', 'The students (they) niega con do not read.', { negative: true }),
+        transformQuestion('Paul', 'Music club on Fridays', 'attend', 'Does'),
+        gapWithVerb('Our teacher', 'Science clearly', 'teach', 'teaches', 'Teach termina en -ch y toma -es con he/she.'),
+        gapWithVerb('Valeria', 'soccer with her friends', 'play', 'plays', 'Vocal + y agrega solo -s → plays.'),
+        gapWithVerb('My classmates', 'the library at noon', 'visit', 'visit', 'My classmates (they) conserva el verbo base visit.'),
+        gapWithVerb('Carlos', 'his homework after school', 'do', 'does not do', 'Carlos (he) niega con does not + verbo base do.', { negative: true }),
+        transformQuestion('They', 'to Music class on Mondays', 'go', 'Do'),
+      ],
+    },
   ],
   3: [
     {
       label: 'Parte 6 · Reescribe con CAN o CANNOT',
       intro: 'Copia el sujeto y el complemento. Usa el signo y recupera el verbo base.',
       items: modalExamples,
+    },
+    {
+      label: 'Reescritura ampliada (+) y (−)',
+      intro: 'Más oraciones del mismo formato con CAN (+) y CANNOT (−) para reforzar la forma base del verbo.',
+      items: [
+        modalRewrite('Sarah', 'read', 'reads', 'novels in the library', true, false),
+        modalRewrite('Paul', 'attend', 'attends', 'five classes a day', true, true),
+        modalRewrite('My classmates', 'play', 'plays', 'soccer after school', false, false),
+        modalRewrite('She', 'study', 'studies', 'Chemistry at home', true, true),
+        modalRewrite('Tom', 'fix', 'fixes', 'computers in Information Technology', true, false),
+        modalRewrite('We', 'go', 'goes', 'to the gym on Fridays', false, true),
+      ],
     },
   ],
   4: [
@@ -859,6 +779,20 @@ export const verbSetsByTopic: Record<number, VerbDrillSet[]> = {
       label: 'Diez verbos · Preguntas en pasado',
       intro: 'Escribe la pregunta completa con Did y el verbo base.',
       items: verbForms.map((v) => transformQuestion('She', v.then, v.base, 'Did')),
+    },
+    {
+      label: 'Serie mixta · Igual que Presente, pero en Pasado Simple',
+      intro: 'Completa oraciones afirmativas, negativas (didn’t + base) y preguntas (Did + sujeto + base) en Past Simple.',
+      items: [
+        gapWithVerb('The students', 'volleyball in the gym yesterday', 'play', 'played', 'Vocal + y agrega -ed → played.', { cueBefore: true }),
+        gapWithVerb('She', 'to the library last Friday', 'go', 'went', 'Go es irregular en pasado: went.', { cueBefore: true }),
+        gapWithVerb('Our team', 'the basketball match on Saturday', 'win', 'did not win', 'Con not en pasado usa did not + verbo base win.', { negative: true, cueBefore: true }),
+        transformQuestion('Elena', 'traditional food in Nicoya', 'eat', 'Did'),
+        gapWithVerb('Our teacher', 'History and Geography last year', 'teach', 'taught', 'Teach es irregular: taught.', { cueBefore: true }),
+        gapWithVerb('Paul', 'the morning assembly yesterday', 'attend', 'did not attend', 'Did not + verbo base attend.', { negative: true, cueBefore: true }),
+        gapWithVerb('Valeria', 'a story in her notebook last night', 'read', 'read', 'El pasado de read se escribe igual (read).', { cueBefore: true }),
+        transformQuestion('They', 'tickets for the concert yesterday', 'buy', 'Did'),
+      ],
     },
   ],
 };

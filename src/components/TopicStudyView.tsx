@@ -315,7 +315,7 @@ export function TopicStudyView({ topic, onNavigateTab }: TopicStudyViewProps) {
 
           <details className="rounded-xl border border-[#d4e4dd] bg-white p-4">
             <summary className="cursor-pointer font-bold text-sm text-[#17644e]">
-              Ampliación anual: 6 verbos frecuentes adicionales (Trimestres 2 y 3)
+              6 verbos adicionales para practicar Present Simple y Past Simple
             </summary>
             <div className="overflow-x-auto mt-3">
               <table className="w-full text-left text-sm border-collapse">

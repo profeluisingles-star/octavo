@@ -24,7 +24,7 @@ export const topics: Topic[] = [
     id: 0,
     title: 'School Subjects',
     subtitle: 'Materias del colegio',
-    period: 'Trimestre 1 · Convocatoria Base',
+    period: 'Tema 1 · Vocabulario y tarjetas',
     isOriginalConvocatoria: true,
     source: 'Parte 1 · páginas 1 y 2',
     goal: 'Relaciona la descripción en inglés con la tarjeta ilustrada de la materia.',
@@ -58,11 +58,11 @@ export const topics: Topic[] = [
   {
     id: 1,
     title: 'Present Simple',
-    subtitle: 'Afirmativas, negativas, preguntas y lectura escolar',
-    period: 'Trimestre 1 · Convocatoria Base',
+    subtitle: 'Afirmativas, negativas, preguntas, completar oraciones y lectura escolar',
+    period: 'Tema 2 · Presente Simple',
     isOriginalConvocatoria: true,
     source: 'Partes 2, 3 y 5 · páginas 2 a 5',
-    goal: 'Aplica la regla de la S y decide cuándo usar do, does o el verbo to be.',
+    goal: 'Aplica la regla de la S, completa oraciones en Present Simple y decide cuándo usar do, does o el verbo to be.',
     steps: [
       ['Encuentra el sujeto', 'Subraya mentalmente quién hace la acción. I, you, we y they usan el verbo base en afirmativo. He, she e it llevan la forma de tercera persona. My teacher equivale a he o she. Emma and I equivale a we.'],
       ['Aplica la ley de la S en afirmativas', 'Usualmente agrega -s (attend → attends, like → likes). Con terminaciones como -ch, -sh, -ss o -x agrega -es (teach → teaches, fix → fixes). En go y do se escribe goes y does. Si hay consonante + y, cambia la y por -ies (study → studies). Si hay vocal + y, agrega -s (play → plays, enjoy → enjoys, buy → buys). Have cambia a has.'],
@@ -91,7 +91,7 @@ export const topics: Topic[] = [
     id: 2,
     title: 'IN, ON and AT',
     subtitle: 'Preposiciones de tiempo',
-    period: 'Trimestre 1 · Convocatoria Base',
+    period: 'Tema 3 · Preposiciones',
     isOriginalConvocatoria: true,
     source: 'Parte 4 · página 3',
     goal: 'Elige la preposición según la expresión de tiempo.',
@@ -118,11 +118,11 @@ export const topics: Topic[] = [
   {
     id: 3,
     title: 'CAN and CANNOT',
-    subtitle: 'Reescritura de oraciones',
-    period: 'Trimestre 1 · Convocatoria Base',
+    subtitle: 'Reescritura y completar oraciones',
+    period: 'Tema 4 · Habilidades con CAN / CANNOT',
     isOriginalConvocatoria: true,
     source: 'Parte 6 · páginas 5 y 6',
-    goal: 'Reescribe la oración completa con can (+) o cannot / can’t (−).',
+    goal: 'Reescribe y completa oraciones con can (+) o cannot / can’t (−) devolviendo el verbo a su forma base.',
     steps: [
       ['Lee el signo del ejercicio', '(+) indica que debes escribir can. (−) indica que debes escribir cannot o can’t. “They walk to school every day. (+)” se convierte en “They can walk to school every day.”'],
       ['Conserva el sujeto y el resto de la oración', 'Empieza con el mismo sujeto. Pon can o cannot inmediatamente después. Conserva el complemento: “before bed”, “after school” o “at noon”.'],
@@ -146,16 +146,16 @@ export const topics: Topic[] = [
   {
     id: 4,
     title: 'Past Simple, Sports and Holidays',
-    subtitle: 'Pasado simple, deportes y días festivos',
-    period: 'Trimestre 1 · Convocatoria Base',
+    subtitle: 'Pasado simple (afirmativa, negativa, pregunta), deportes y días festivos',
+    period: 'Tema 5 · Pasado Simple y Lecturas',
     isOriginalConvocatoria: true,
     source: 'Partes 7 a 10 · páginas 6 a 12',
-    goal: 'Completa verbos en pasado y responde preguntas de los textos de deportes y festividades.',
+    goal: 'Conjuga verbos en pasado en afirmativa, negativa y pregunta igual que en presente simple, y responde preguntas de deportes y festividades.',
     steps: [
       ['Usa la pista entre paréntesis', '(study) pide una afirmación en pasado: studied. (not / enjoy) pide una negación: did not enjoy o didn’t enjoy. Palabras como yesterday o last week confirman que es pasado.'],
       ['Aprende las formas de la tabla', 'Regulares: study → studied, enjoy → enjoyed, travel → travelled, discover → discovered, fix → fixed. Irregulares: see → saw, buy → bought, write → wrote, understand → understood, eat → ate. Travelled aparece en el PDF. Traveled también es válido.'],
       ['Después de didn’t usa el verbo base', '“She bought the tickets” → “She didn’t buy the tickets.” Didn’t ya indica pasado. Escribe didn’t see, didn’t write y didn’t eat.'],
-      ['Para una pregunta usa Did + sujeto + verbo base', '“She bought the tickets yesterday” → “Did she buy the tickets yesterday?” Did ya indica pasado. Por eso la pregunta lleva buy y la afirmación lleva bought. La Parte 8 del PDF trae afirmativas y negativas. Las preguntas son práctica adicional.'],
+      ['Para una pregunta usa Did + sujeto + verbo base', '“She bought the tickets yesterday” → “Did she buy the tickets yesterday?” Did ya indica pasado. Por eso la pregunta lleva buy y la afirmación lleva bought. Funciona igual para todos los sujetos (I, she, we, they).'],
       ['Clasifica los deportes con dos pistas distintas', 'Indoor / outdoor indican dónde se practica en la lectura. Team / individual indican cómo se compite. En el texto, basketball es indoor y team, y running es outdoor e individual. Basa tu respuesta en el texto de la pregunta.'],
       ['Usa el banco de palabras de festividades', 'Mira tanto el significado como el espacio. “Spring ___” pide festival. “Red envelopes with ___ inside” pide money. “Independence Day celebrates the country’s ___” pide freedom.'],
       ['Convierte el dato en oración', 'What pide un dato, Who una persona, Where un lugar, When un momento y Why una razón. Para Why, empieza con sujeto + verbo + because y agrega la razón del personaje correcto.'],
@@ -163,97 +163,22 @@ export const topics: Topic[] = [
     map: [
       ['Regulares', 'study → studied · enjoy → enjoyed · travel → travelled · discover → discovered · fix → fixed'],
       ['Irregulares', 'see → saw · buy → bought · write → wrote · understand → understood · eat → ate'],
-      ['Negativa', 'She didn’t buy the tickets.'],
-      ['Pregunta', 'Did she buy the tickets?'],
+      ['Negativa', 'She didn’t buy the tickets. · They did not go.'],
+      ['Pregunta', 'Did she buy the tickets? · Where did Elena travel?'],
       ['Deportes', 'indoor · outdoor · team · individual'],
       ['Festividades', 'Christmas · Spring Festival · Ramadan · Thanksgiving · Independence Day'],
     ],
     video: 'https://www.youtube.com/watch?v=DQlzxDz5T0w',
     videoLabel: 'Pasado simple · Mr. Pea',
-    practiceCue: 'Verifica la pista del paréntesis, el dato exacto del texto o la palabra del banco. Para una pregunta con Why, busca la razón.',
+    practiceCue: 'Verifica la pista del paréntesis, el dato exacto del texto o la palabra del banco. Recuerda que con did / didn’t el verbo vuelve a su forma base.',
     narrationUrl: NARRATION_URL,
     narrationTime: ORIGINAL_NARRATION_TIMES[4],
     narrationTranscript: ORIGINAL_NARRATION_PARTS[4],
   },
-  {
-    id: 5,
-    title: 'Daily Routines, Frequency & Time',
-    subtitle: 'Rutinas, adverbios de frecuencia y la hora',
-    period: 'Trimestre 2 · Ampliación Anual',
-    isOriginalConvocatoria: false,
-    source: 'Unidad Anual 6 · Plan de 8.º Año MEP',
-    goal: 'Describe rutinas diarias usando adverbios de frecuencia (always a never) y expresiones exactas de hora.',
-    steps: [
-      ['Coloca el adverbio de frecuencia en el lugar correcto', 'Los adverbios (always 100%, usually 80%, often 60%, sometimes 40%, rarely 20%, never 0%) van ANTES del verbo principal: “She always studies at 4:00.”'],
-      ['Recuerda la excepción con el verbo To Be', 'Cuando la oración usa am, is o are, el adverbio va DESPUÉS de be: “He is never late for English class.”'],
-      ['Pregunta con How often...?', 'Para saber la frecuencia pregunta: “How often do you play soccer?” y responde con el adverbio o con once a week, twice a week, every day.'],
-      ['Lee y escribe la hora en inglés', 'En punto usa o’clock (7:00 = seven o’clock). Media hora usa half past (7:30 = half past seven / seven thirty). Y cuarto usa a quarter past; un cuarto para usa a quarter to.'],
-    ],
-    map: [
-      ['100% → 0%', 'always · usually · often · sometimes · rarely · never'],
-      ['Posición verbo normal', 'Sujeto + adverbio + verbo (We usually walk home.)'],
-      ['Posición verbo BE', 'Sujeto + be + adverbio (Classes are always interesting.)'],
-      ['Horas clave', 'o’clock (:00) · quarter past (:15) · half past (:30) · quarter to (:45)'],
-    ],
-    video: 'https://www.youtube.com/watch?v=vAHD0rSZJH8',
-    videoLabel: 'Adverbs of Frequency · Inglés práctico',
-    practiceCue: 'Fíjate si el verbo es be (adverbio después) o un verbo de acción (adverbio antes). En las horas, revisa los minutos.',
-    narrationTranscript: 'En esta unidad de segundo trimestre combinamos la frecuencia con la hora exacta. Recuerda: siempre decimos I always study, pero decimos I am always ready. Con How often preguntamos qué tan seguido haces una actividad escolar o deportiva.',
-  },
-  {
-    id: 6,
-    title: 'Future Plans & Costa Rican Places',
-    subtitle: 'Planes futuros (Going To / Will) y turismo local',
-    period: 'Trimestre 2 · Ampliación Anual',
-    isOriginalConvocatoria: false,
-    source: 'Unidad Anual 7 · Plan de 8.º Año MEP',
-    goal: 'Expresa planes e intenciones futuras con be going to y decisiones o predicciones con will en contextos de Costa Rica.',
-    steps: [
-      ['Usa BE + GOING TO para planes decididos', 'Forma: sujeto + am/is/are + going to + verbo base. Ejemplo: “We are going to visit Arenal Volcano next Saturday.”'],
-      ['Niega e interroga con Going To', 'Negativa: sujeto + am/is/are + not + going to + verbo. Pregunta: Are you going to travel to Guanacaste?'],
-      ['Usa WILL para decisiones rápidas o promesas', 'Forma: sujeto + will + verbo base (afirmativa) o will not / won’t + verbo base (negativa). Ejemplo: “I think it will rain this afternoon.”'],
-      ['Vocabulario de lugares y direcciones', 'Identifica espacios clave: beach, national park, rainforest, volcano, museum, bus station, turn left, turn right, go straight.'],
-    ],
-    map: [
-      ['Going To (+)', 'She is going to visit Tortuguero.'],
-      ['Going To (−)', 'They are not going to stay home.'],
-      ['Will (+ / −)', 'It will be sunny. · We won’t arrive late.'],
-      ['Lugares de Costa Rica', 'rainforest · volcano · beach · national park · market'],
-    ],
-    video: 'https://www.youtube.com/watch?v=0_-8yPyCDHI',
-    videoLabel: 'Future with Going To & Will · Gramática',
-    practiceCue: 'Si ves am/is/are antes del espacio para un plan, busca going to + verbo base. Para will, usa el verbo sin -s ni -ed.',
-    narrationTranscript: 'Para hablar del futuro en octavo año distinguimos dos formas. Usamos be going to cuando ya tienes un plan pensado, como visitar Manuel Antonio o Tortuguero en vacaciones. Usamos will cuando decides algo en el momento o haces una predicción del clima.',
-  },
-  {
-    id: 7,
-    title: 'Past Continuous & Comparisons',
-    subtitle: 'Pasado continuo, comparativos y superlativos',
-    period: 'Trimestre 3 · Consolidación Anual',
-    isOriginalConvocatoria: false,
-    source: 'Unidad Anual 8 · Plan de 8.º Año MEP',
-    goal: 'Relata acciones en progreso en el pasado (was/were + -ing) y compara lugares, deportes o materias.',
-    steps: [
-      ['Forma el Past Continuous con WAS o WERE', 'I, he, she, it usan was + verbo-ing. You, we, they usan were + verbo-ing. Ejemplo: “Elena was reading while it was raining.”'],
-      ['Combina Past Continuous y Past Simple', 'Usa while para la acción larga en progreso (was/were + -ing) y when para la acción corta que interrumpe (pasado simple).'],
-      ['Compara dos elementos (Comparativos)', 'Adjetivos cortos: + -er + than (faster than, bigger than). Adjetivos largos: more + adjetivo + than (more interesting than). Irregulares: good → better, bad → worse.'],
-      ['Destaca el extremo de un grupo (Superlativos)', 'Adjetivos cortos: the + adjetivo + -est (the tallest, the easiest). Adjetivos largos: the most + adjetivo (the most exciting). Irregulares: good → the best, bad → the worst.'],
-    ],
-    map: [
-      ['Past Continuous', 'I/he/she/it was studying · You/we/they were playing'],
-      ['When vs While', 'while + was/were -ing · when + past simple'],
-      ['Comparativos (2 cosas)', 'taller than · more difficult than · better than'],
-      ['Superlativos (3+ cosas)', 'the tallest · the most popular · the best'],
-    ],
-    video: 'https://www.youtube.com/watch?v=9lv_797iq6E',
-    videoLabel: 'Past Continuous vs Past Simple',
-    practiceCue: 'Revisa si el sujeto es singular (was) o plural (were) con -ing. En comparaciones, busca than (comparativo) o the (superlativo).',
-    narrationTranscript: 'En el cierre del año dominamos el pasado continuo y las comparaciones. Con was o were más el gerundio en -ing describimos lo que estaba pasando en un momento del pasado. Y con than o the most podemos comparar deportes, materias y lugares del país.',
-  },
 ];
 
 export const worked: WorkedExample[][] = [
-  // Topic 0 (original verbatim)
+  // Topic 0
   [
     ['I deal with numbers, shapes, and equations.', 'Trabajo con números, figuras y ecuaciones.', 'Math. Las palabras numbers y equations indican Matemáticas.'],
     ['I explore plants, animals, and the human body.', 'Exploro las plantas, los animales y el cuerpo humano.', 'Biology. La descripción se concentra en seres vivos.'],
@@ -266,7 +191,7 @@ export const worked: WorkedExample[][] = [
     ['I focus on exercise, games, and staying healthy.', 'Me concentro en el ejercicio, los juegos y mantener la salud.', 'Physical Education. Exercise y games indican actividad física.'],
     ['I teach you to write programs and solve problems with technology.', 'Te enseño a escribir programas y resolver problemas con tecnología.', 'Information Technology. Write programs es la pista clave.'],
   ],
-  // Topic 1 (original verbatim)
+  // Topic 1
   [
     ['I play with my friends. / She studies English every day.', 'Juego con mis amigos. / Ella estudia inglés todos los días.', 'I usa play. She usa studies porque study termina en consonante + y.'],
     ['My teacher teaches a lot of things.', 'Mi docente enseña muchas cosas.', 'My teacher es una persona. Teach termina en -ch y agrega -es.'],
@@ -278,7 +203,7 @@ export const worked: WorkedExample[][] = [
     ['Music is very interesting. / Is music interesting?', 'La música es muy interesante. / ¿Es interesante la música?', 'Con be, pasa is al inicio para preguntar.'],
     ['School rules are not followed by everyone.', 'Las normas escolares no son respetadas por todos.', 'Rules es plural y la frase usa be en voz pasiva. En ese espacio va are not.'],
   ],
-  // Topic 2 (original verbatim)
+  // Topic 2
   [
     ['I go to school in the afternoon.', 'Voy al colegio en la tarde.', 'The afternoon es una parte del día.'],
     ['I attend math classes on Wednesday.', 'Voy a clases de matemáticas el miércoles.', 'Wednesday es un día de la semana.'],
@@ -288,7 +213,7 @@ export const worked: WorkedExample[][] = [
     ['Zoe goes to bed at night.', 'Zoe se acuesta de noche.', 'At night es la expresión fija.'],
     ['On Wednesday afternoon, class starts at 2:00.', 'El miércoles por la tarde la clase empieza a las dos.', 'El día más la parte del día lleva on. La hora lleva at.'],
   ],
-  // Topic 3 (original verbatim)
+  // Topic 3
   [
     ['I play soccer every weekend. (+) → I can play soccer every weekend.', 'Juego fútbol todos los fines de semana. → Puedo jugar fútbol todos los fines de semana.', 'Agrega can y conserva play.'],
     ['She reads a book before bed. (−) → She cannot read a book before bed.', 'Ella lee un libro antes de dormir. → Ella no puede leer un libro antes de dormir.', 'Usa cannot y cambia reads a read.'],
@@ -297,7 +222,7 @@ export const worked: WorkedExample[][] = [
     ['My brother watches television in the evening. (−) → My brother cannot watch television in the evening.', 'Mi hermano ve televisión al anochecer. → No puede ver televisión al anochecer.', 'Conserva My brother y el complemento. Watches vuelve a watch.'],
     ['Carlos drives to work every morning. (−) → Carlos can’t drive to work every morning.', 'Carlos va al trabajo en carro todas las mañanas. → Carlos no puede hacerlo todas las mañanas.', 'El verbo base de drives es drive.'],
   ],
-  // Topic 4 (original verbatim)
+  // Topic 4
   [
     ['Our family travelled to Manuel Antonio during the summer holidays.', 'Nuestra familia viajó a Manuel Antonio durante las vacaciones de verano.', 'Travelled sigue la forma británica que usa el PDF. Traveled es la forma estadounidense.'],
     ['I didn’t see Carlos at the library yesterday.', 'Ayer no vi a Carlos en la biblioteca.', 'Usa didn’t + see, la forma base.'],
@@ -308,33 +233,6 @@ export const worked: WorkedExample[][] = [
     ['Which is an individual sport? Swimming is an individual sport.', '¿Cuál es un deporte individual? La natación es un deporte individual.', 'La lectura clasifica swimming entre los deportes individuales.'],
     ['Children receive red envelopes with money inside.', 'Los niños reciben sobres rojos con dinero dentro.', 'Si el espacio viene después de with, money es la palabra que completa el dato.'],
     ['Why does Tony value Independence Day? Tony values it because it celebrates his country’s freedom.', '¿Por qué Tony valora el Día de la Independencia? Porque celebra la libertad de su país.', 'Responde en una oración con sujeto, verbo y una razón que empieza con because.'],
-  ],
-  // Topic 5 (Year Expansion)
-  [
-    ['Daniel always wakes up at six o’clock.', 'Daniel siempre se despierta a las seis en punto.', 'Always va antes del verbo principal wakes up.'],
-    ['Our English teacher is never late for class.', 'Nuestro profesor de inglés nunca llega tarde a clase.', 'Con el verbo be (is), never va después de is.'],
-    ['The morning bus leaves at a quarter past seven.', 'El autobús de la mañana sale a las siete y cuarto.', 'A quarter past seven indica las 7:15.'],
-    ['How often do you practice sports? Twice a week.', '¿Con qué frecuencia practicas deportes? Dos veces por semana.', 'How often pregunta por frecuencia; twice significa dos veces.'],
-    ['Science class finishes at half past ten.', 'La clase de Ciencias termina a las diez y media.', 'Half past ten indica las 10:30.'],
-    ['We sometimes review flashcards before a quiz.', 'A veces repasamos tarjetas antes de un quiz.', 'Sometimes (40%) va entre we y el verbo review.'],
-  ],
-  // Topic 6 (Year Expansion)
-  [
-    ['Our class is going to visit Cartago next Friday.', 'Nuestra clase va a visitar Cartago el próximo viernes.', 'Plan futuro ya decidido: is going to + visit.'],
-    ['They are not going to cancel the soccer match.', 'No van a cancelar el partido de fútbol.', 'Negación de be going to con are not going to.'],
-    ['Are you going to study Biology tonight?', '¿Vas a estudiar Biología esta noche?', 'En preguntas, Are pasa al principio antes de you.'],
-    ['I think it will rain near the rainforest.', 'Creo que lloverá cerca del bosque lluvioso.', 'Predicción o opinión con I think usa will + verbo base.'],
-    ['She won’t forget her notebook tomorrow.', 'Ella no olvidará su cuaderno mañana.', 'Won’t es la forma corta de will not.'],
-    ['Go straight and turn left at the library.', 'Sigue directo y dobla a la izquierda en la biblioteca.', 'Imperativo directo para dar indicaciones de lugares.'],
-  ],
-  // Topic 7 (Year Expansion)
-  [
-    ['While Sofia was reading, her brother was fixing the bike.', 'Mientras Sofía leía, su hermano estaba arreglando la bicicleta.', 'Dos acciones en progreso al mismo tiempo usan was/were + -ing.'],
-    ['The students were taking notes when the bell rang.', 'Los estudiantes estaban tomando apuntes cuando sonó el timbre.', 'Were taking (Past Continuous) fue interrumpido por rang (Past Simple).'],
-    ['History is easier than Chemistry for me.', 'Historia es más fácil que Química para mí.', 'Easy termina en -y, por eso cambia a easier than.'],
-    ['Information Technology is more modern than Drama.', 'Informática es más moderna que Teatro.', 'Adjetivos largos como modern usan more ... than.'],
-    ['Chirripó is the highest mountain in Costa Rica.', 'El Chirripó es la montaña más alta de Costa Rica.', 'Superlativo corto: the + high + -est.'],
-    ['Reading comprehension is the most useful skill for exams.', 'La comprensión lectora es la habilidad más útil para los exámenes.', 'Superlativo largo: the most + adjetivo.'],
   ],
 ];
 
@@ -351,13 +249,14 @@ export const verbForms: VerbForm[] = [
   { base: 'eat', third: 'eats', past: 'ate', participle: 'eaten', gerund: 'eating', es: 'comer', present: 'breakfast before school', then: 'breakfast with her grandparents yesterday', rule: 'Eat es irregular. Ate es el pasado simple y eaten es el participio.' },
 ];
 
+// Additional exam-aligned verbs for expanded Present Simple & Past Simple drills
 export const extraYearVerbs: VerbForm[] = [
-  { base: 'go', third: 'goes', past: 'went', participle: 'gone', gerund: 'going', es: 'ir', present: 'to the park on Sundays', then: 'to Cartago yesterday', rule: 'Go agrega -es (goes) y su pasado irregular es went.' },
-  { base: 'win', third: 'wins', past: 'won', participle: 'won', gerund: 'winning', es: 'ganar', present: 'matches at school', then: 'the tournament last Friday', rule: 'Win es irregular: su pasado es won y su gerundio duplica la n (winning).' },
-  { base: 'make', third: 'makes', past: 'made', participle: 'made', gerund: 'making', es: 'hacer / preparar', present: 'cookies with her mom', then: 'a poster for Science class', rule: 'Make es irregular: made en pasado y participio; making pierde la -e final.' },
-  { base: 'take', third: 'takes', past: 'took', participle: 'taken', gerund: 'taking', es: 'tomar / llevar', present: 'notes in every class', then: 'photos at the volcano', rule: 'Take es irregular: took en pasado simple y taken en participio.' },
-  { base: 'teach', third: 'teaches', past: 'taught', participle: 'taught', gerund: 'teaching', es: 'enseñar', present: 'English in eighth grade', then: 'a new song yesterday', rule: 'Teach termina en -ch (teaches) y su pasado irregular es taught.' },
-  { base: 'visit', third: 'visits', past: 'visited', participle: 'visited', gerund: 'visiting', es: 'visitar', present: 'her grandparents on weekends', then: 'a national park last month', rule: 'Visit es regular: visits en tercera persona y visited en pasado.' },
+  { base: 'play', third: 'plays', past: 'played', participle: 'played', gerund: 'playing', es: 'jugar / tocar instrumento', present: 'soccer with friends', then: 'volleyball in the gym last Friday', rule: 'Vocal + y conserva la y: plays en presente y played en pasado.' },
+  { base: 'attend', third: 'attends', past: 'attended', participle: 'attended', gerund: 'attending', es: 'asistir a', present: 'five classes a day', then: 'the morning assembly yesterday', rule: 'Attend agrega -s (attends) en presente y -ed (attended) en pasado.' },
+  { base: 'teach', third: 'teaches', past: 'taught', participle: 'taught', gerund: 'teaching', es: 'enseñar', present: 'History and Geography', then: 'the new lesson yesterday', rule: 'Teach termina en -ch (teaches) en presente y su pasado irregular es taught.' },
+  { base: 'read', third: 'reads', past: 'read', participle: 'read', gerund: 'reading', es: 'leer', present: 'novels in the library', then: 'a short story last night', rule: 'Read lleva -s en presente (reads); en pasado se escribe igual (read) pero se pronuncia como “red”.' },
+  { base: 'go', third: 'goes', past: 'went', participle: 'gone', gerund: 'going', es: 'ir', present: 'to the park on Sundays', then: 'to Nicoya in July', rule: 'Go agrega -es (goes) en presente y su pasado irregular es went.' },
+  { base: 'win', third: 'wins', past: 'won', participle: 'won', gerund: 'winning', es: 'ganar', present: 'table tennis matches', then: 'the school tournament last Saturday', rule: 'Win lleva -s en presente (wins) y su pasado irregular es won.' },
 ];
 
 export const holidayWordBank: string[] = [

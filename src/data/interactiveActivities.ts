@@ -34,6 +34,17 @@ export const audioDrills: AudioDrillItem[] = [
     correctAnswer: 'We play instruments and learn about rhythms.',
     hint: 'Empieza con We play instruments...',
   },
+  {
+    id: 'aud-0-4',
+    topicId: 0,
+    spokenText: 'I teach you to write programs and solve problems with technology.',
+    spanishMeaning: 'Te enseño a escribir programas y resolver problemas con tecnología.',
+    mode: 'comprehension',
+    questionPrompt: '¿A qué materia corresponde el audio?',
+    correctAnswer: 'Information Technology',
+    options: ['Information Technology', 'Math', 'Physical Education'],
+    hint: 'Write programs y technology identifican Information Technology.',
+  },
 
   // Topic 1: Present Simple
   {
@@ -77,6 +88,17 @@ export const audioDrills: AudioDrillItem[] = [
     ],
     hint: 'Inicia con el auxiliar Does y el verbo give en forma base.',
   },
+  {
+    id: 'aud-1-4',
+    topicId: 1,
+    spokenText: 'The students do not do their homework on time.',
+    spanishMeaning: 'Los estudiantes no hacen su tarea a tiempo.',
+    mode: 'dictation',
+    questionPrompt: 'Dictado: escucha esta oración de la Parte 3 y escríbela en inglés:',
+    correctAnswer: 'The students do not do their homework on time.',
+    alternatives: ["The students don't do their homework on time."],
+    hint: 'Recuerda: auxiliar do not + verbo principal do.',
+  },
 
   // Topic 2: IN, ON and AT
   {
@@ -115,6 +137,16 @@ export const audioDrills: AudioDrillItem[] = [
     correctAnswer: 'Zoe goes to bed at night.',
     hint: 'Recuerda: Zoe goes + at night.',
   },
+  {
+    id: 'aud-2-4',
+    topicId: 2,
+    spokenText: 'I go to school in the afternoon.',
+    spanishMeaning: 'Voy al colegio en la tarde.',
+    mode: 'dictation',
+    questionPrompt: 'Dictado: escribe la oración con la preposición correcta:',
+    correctAnswer: 'I go to school in the afternoon.',
+    hint: 'The afternoon es una parte del día → in.',
+  },
 
   // Topic 3: CAN and CANNOT
   {
@@ -141,6 +173,17 @@ export const audioDrills: AudioDrillItem[] = [
       'Que ve televisión en el desayuno.',
     ],
     hint: 'Cannot expresa imposibilidad o negación.',
+  },
+  {
+    id: 'aud-3-3',
+    topicId: 3,
+    spokenText: 'She cannot read a book before bed.',
+    spanishMeaning: 'Ella no puede leer un libro antes de dormir.',
+    mode: 'dictation',
+    questionPrompt: 'Dictado: escribe la oración completa en negativo:',
+    correctAnswer: 'She cannot read a book before bed.',
+    alternatives: ["She can't read a book before bed."],
+    hint: 'Después de cannot, read no lleva -s.',
   },
 
   // Topic 4: Past Simple, Sports and Holidays
@@ -185,86 +228,15 @@ export const audioDrills: AudioDrillItem[] = [
     ],
     hint: 'Indoor = bajo techo; team = en equipo.',
   },
-
-  // Topic 5: Daily Routines & Time
   {
-    id: 'aud-5-1',
-    topicId: 5,
-    spokenText: 'My school bus always arrives at a quarter to seven.',
-    spanishMeaning: 'Mi autobús escolar siempre llega a las siete menos cuarto.',
-    mode: 'comprehension',
-    questionPrompt: '¿A qué hora llega el autobús según el audio?',
-    correctAnswer: '6:45 (A quarter to seven)',
-    options: [
-      '6:45 (A quarter to seven)',
-      '7:15 (A quarter past seven)',
-      '7:30 (Half past seven)',
-    ],
-    hint: 'A quarter to seven = 15 minutos antes de las 7.',
-  },
-  {
-    id: 'aud-5-2',
-    topicId: 5,
-    spokenText: 'Our English teacher is never late.',
-    spanishMeaning: 'Nuestro profesor de inglés nunca llega tarde.',
+    id: 'aud-4-4',
+    topicId: 4,
+    spokenText: 'Did Martha enjoy the documentary last night?',
+    spanishMeaning: '¿Disfrutó Martha el documental anoche?',
     mode: 'dictation',
-    questionPrompt: 'Dictado: escribe la oración exacta:',
-    correctAnswer: 'Our English teacher is never late.',
-    hint: 'Observa que is va antes de never.',
-  },
-
-  // Topic 6: Future Plans & Places
-  {
-    id: 'aud-6-1',
-    topicId: 6,
-    spokenText: 'The students are going to visit Arenal Volcano next Saturday.',
-    spanishMeaning: 'Los estudiantes van a visitar el Volcán Arenal el próximo sábado.',
-    mode: 'comprehension',
-    questionPrompt: '¿Qué expresa el audio?',
-    correctAnswer: 'Un plan futuro decidido con going to',
-    options: [
-      'Un plan futuro decidido con going to',
-      'Una rutina semanal del pasado',
-      'Una habilidad con cannot',
-    ],
-    hint: 'Are going to + visit indica un plan futuro.',
-  },
-  {
-    id: 'aud-6-2',
-    topicId: 6,
-    spokenText: 'I think it will be sunny tomorrow.',
-    spanishMeaning: 'Creo que estará soleado mañana.',
-    mode: 'dictation',
-    questionPrompt: 'Dictado: escribe la predicción con will:',
-    correctAnswer: 'I think it will be sunny tomorrow.',
-    hint: 'I think it will be...',
-  },
-
-  // Topic 7: Past Continuous & Comparisons
-  {
-    id: 'aud-7-1',
-    topicId: 7,
-    spokenText: 'While Sofia was reading, her friends were playing board games.',
-    spanishMeaning: 'Mientras Sofía leía, sus amigos estaban jugando juegos de mesa.',
-    mode: 'comprehension',
-    questionPrompt: '¿Qué tiempo verbal escuchaste en ambas acciones simultáneas?',
-    correctAnswer: 'Past Continuous (was reading / were playing)',
-    options: [
-      'Past Continuous (was reading / were playing)',
-      'Present Simple',
-      'Future with will',
-    ],
-    hint: 'While une dos acciones en progreso en el pasado.',
-  },
-  {
-    id: 'aud-7-2',
-    topicId: 7,
-    spokenText: 'Tamarindo was quieter than Puntarenas in the morning.',
-    spanishMeaning: 'Tamarindo estaba más tranquilo que Puntarenas en la mañana.',
-    mode: 'dictation',
-    questionPrompt: 'Dictado: escribe el comparativo que escuchas:',
-    correctAnswer: 'Tamarindo was quieter than Puntarenas in the morning.',
-    hint: 'Quieter + than compara dos playas.',
+    questionPrompt: 'Dictado: escribe esta pregunta en Past Simple:',
+    correctAnswer: 'Did Martha enjoy the documentary last night?',
+    hint: 'Empieza con Did + Martha + verbo base enjoy.',
   },
 ];
 
@@ -274,10 +246,12 @@ export const flashcards: FlashcardItem[] = [
   { id: 'fc-0-2', topicId: 0, front: 'I explore plants, animals, and the human body.', back: 'Biology (Biología)', example: 'In Biology we study living cells.', category: 'School Subjects' },
   { id: 'fc-0-3', topicId: 0, front: 'I study chemical reactions and matter.', back: 'Chemistry (Química)', example: 'We mix substances safely in Chemistry.', category: 'School Subjects' },
   { id: 'fc-0-4', topicId: 0, front: 'I look at the Earth’s landscapes and countries.', back: 'Geography (Geografía)', example: 'We study Costa Rican mountains in Geography.', category: 'School Subjects' },
+  { id: 'fc-0-5', topicId: 0, front: 'I teach about events and people from the past.', back: 'History (Historia)', example: 'We place past events on a timeline in History.', category: 'School Subjects' },
   // Topic 1
   { id: 'fc-1-1', topicId: 1, front: 'Regla 3.ª persona: consonante + y (study)', back: 'Cambia y → ies (studies)', example: 'She studies English every day.', category: 'Present Simple' },
   { id: 'fc-1-2', topicId: 1, front: 'Negación con He / She / It', back: 'does not (doesn’t) + verbo base', example: 'Sarah does not read novels.', category: 'Present Simple' },
   { id: 'fc-1-3', topicId: 1, front: 'Pregunta por el sujeto (Who...)', back: 'Who + verbo con -s (sin do/does)', example: 'Who gives a speech at assembly?', category: 'Present Simple' },
+  { id: 'fc-1-4', topicId: 1, front: 'Verbo To Be en Present Simple', back: 'I am · he/she/it is · you/we/they are', example: 'School rules are not followed by everyone.', category: 'Present Simple' },
   // Topic 2
   { id: 'fc-2-1', topicId: 2, front: 'Preposición IN (Tiempo)', back: 'Años, meses y partes del día', example: 'in 1991 · in September · in the afternoon', category: 'Prepositions' },
   { id: 'fc-2-2', topicId: 2, front: 'Preposición ON (Tiempo)', back: 'Días de la semana y fechas completas', example: 'on Wednesday · on September 15th', category: 'Prepositions' },
@@ -289,15 +263,7 @@ export const flashcards: FlashcardItem[] = [
   { id: 'fc-4-1', topicId: 4, front: 'Irregular Past: see / buy / write / eat', back: 'saw / bought / wrote / ate', example: 'She wrote a poem yesterday.', category: 'Past Simple' },
   { id: 'fc-4-2', topicId: 4, front: 'Irregular Past: understand / go / travel', back: 'understood / went / travelled', example: 'Our family travelled to Manuel Antonio.', category: 'Past Simple' },
   { id: 'fc-4-3', topicId: 4, front: 'Negativa y pregunta en Past Simple', back: 'didn’t + verbo base / Did + sujeto + base?', example: 'Did she buy the tickets?', category: 'Past Simple' },
-  // Topic 5
-  { id: 'fc-5-1', topicId: 5, front: 'Posición de always / usually / never', back: 'Antes del verbo normal; DESPUÉS de am/is/are', example: 'I always study. / She is never late.', category: 'Frequency' },
-  { id: 'fc-5-2', topicId: 5, front: '7:15 · 7:30 · 7:45 en inglés', back: 'quarter past 7 · half past 7 · quarter to 8', example: 'The bus arrives at a quarter to seven.', category: 'Telling Time' },
-  // Topic 6
-  { id: 'fc-6-1', topicId: 6, front: 'Planes decididos (Going To)', back: 'am / is / are + going to + verbo base', example: 'We are going to visit La Fortuna.', category: 'Future' },
-  { id: 'fc-6-2', topicId: 6, front: 'Predicciones o decisiones rápidas (Will)', back: 'will / won’t + verbo base', example: 'I think it will be sunny.', category: 'Future' },
-  // Topic 7
-  { id: 'fc-7-1', topicId: 7, front: 'Past Continuous (while / when)', back: 'was / were + verbo-ing', example: 'While she was reading, it rained.', category: 'Past Continuous' },
-  { id: 'fc-7-2', topicId: 7, front: 'Comparativo vs Superlativo', back: '-er than / more ... than vs the -est / the most', example: 'Easier than · The most exciting', category: 'Comparisons' },
+  { id: 'fc-4-4', topicId: 4, front: 'Clasificación de deportes (Sports)', back: 'indoor/outdoor (lugar) · team/individual (modo)', example: 'Basketball: indoor & team · Running: outdoor & individual', category: 'Sports' },
 ];
 
 export const matchPairsByTopic: Record<number, MatchPairItem[]> = {
@@ -340,27 +306,6 @@ export const matchPairsByTopic: Record<number, MatchPairItem[]> = {
     { id: 'mp-4-5', topicId: 4, left: 'see (Pasado)', right: 'saw', spoken: 'I saw Carlos at the library.' },
     { id: 'mp-4-6', topicId: 4, left: 'July 25th (CR)', right: 'Annexation of Nicoya', spoken: 'Annexation of the Partido de Nicoya.' },
   ],
-  5: [
-    { id: 'mp-5-1', topicId: 5, left: '100% de frecuencia', right: 'always', spoken: 'I always study.' },
-    { id: 'mp-5-2', topicId: 5, left: '0% de frecuencia', right: 'never', spoken: 'He is never late.' },
-    { id: 'mp-5-3', topicId: 5, left: '7:30', right: 'half past seven', spoken: 'Half past seven.' },
-    { id: 'mp-5-4', topicId: 5, left: '7:15', right: 'a quarter past seven', spoken: 'A quarter past seven.' },
-    { id: 'mp-5-5', topicId: 5, left: '7:45', right: 'a quarter to eight', spoken: 'A quarter to eight.' },
-  ],
-  6: [
-    { id: 'mp-6-1', topicId: 6, left: 'Plan decidido', right: 'be going to + verbo', spoken: 'We are going to visit Cartago.' },
-    { id: 'mp-6-2', topicId: 6, left: 'Predicción / decisión', right: 'will + verbo base', spoken: 'It will be sunny tomorrow.' },
-    { id: 'mp-6-3', topicId: 6, left: 'Turn left', right: 'Dobla a la izquierda', spoken: 'Turn left at the corner.' },
-    { id: 'mp-6-4', topicId: 6, left: 'Go straight', right: 'Sigue directo', spoken: 'Go straight ahead.' },
-    { id: 'mp-6-5', topicId: 6, left: 'Rainforest', right: 'Bosque lluvioso', spoken: 'We walked in the rainforest.' },
-  ],
-  7: [
-    { id: 'mp-7-1', topicId: 7, left: 'Acción larga en pasado', right: 'was / were + -ing', spoken: 'She was reading a book.' },
-    { id: 'mp-7-2', topicId: 7, left: 'good → comparativo', right: 'better than', spoken: 'English is better than before.' },
-    { id: 'mp-7-3', topicId: 7, left: 'good → superlativo', right: 'the best', spoken: 'This is the best score.' },
-    { id: 'mp-7-4', topicId: 7, left: 'easy → comparativo', right: 'easier than', spoken: 'History is easier than Chemistry.' },
-    { id: 'mp-7-5', topicId: 7, left: 'interesting → superlativo', right: 'the most interesting', spoken: 'It was the most interesting class.' },
-  ],
 };
 
 export const sentenceBuildsByTopic: Record<number, SentenceBuildItem[]> = {
@@ -373,6 +318,15 @@ export const sentenceBuildsByTopic: Record<number, SentenceBuildItem[]> = {
       spanish: 'Trabajo con números, figuras y ecuaciones.',
       tokens: ['deal', 'equations.', 'I', 'and', 'numbers,', 'with', 'shapes,'],
       tip: 'Empieza con el sujeto I y el verbo deal with.',
+    },
+    {
+      id: 'sb-0-2',
+      topicId: 0,
+      instruction: 'Ordena la descripción de Geography:',
+      target: 'We locate countries on a world map.',
+      spanish: 'Ubicamos países en un mapamundi.',
+      tokens: ['countries', 'a', 'We', 'map.', 'locate', 'on', 'world'],
+      tip: 'We + locate + countries + on a world map.',
     },
   ],
   1: [
@@ -405,6 +359,15 @@ export const sentenceBuildsByTopic: Record<number, SentenceBuildItem[]> = {
       tokens: ['starts', 'Wednesday', 'class', 'On', 'at', 'afternoon,', '2:00.'],
       tip: 'Día + parte del día usa On; hora exacta usa at.',
     },
+    {
+      id: 'sb-2-2',
+      topicId: 2,
+      instruction: 'Ordena la oración con fecha patria:',
+      target: 'We celebrate Independence Day on September 15th.',
+      spanish: 'Celebramos el Día de la Independencia el 15 de septiembre.',
+      tokens: ['September', 'celebrate', 'We', '15th.', 'Day', 'Independence', 'on'],
+      tip: 'Antes de September 15th va on.',
+    },
   ],
   3: [
     {
@@ -415,6 +378,15 @@ export const sentenceBuildsByTopic: Record<number, SentenceBuildItem[]> = {
       spanish: 'Ella no puede leer un libro antes de dormir.',
       tokens: ['a', 'before', 'cannot', 'She', 'book', 'bed.', 'read'],
       tip: 'Sujeto + cannot + verbo base (read).',
+    },
+    {
+      id: 'sb-3-2',
+      topicId: 3,
+      instruction: 'Reescribe usando can (+):',
+      target: 'He can study English after school.',
+      spanish: 'Él puede estudiar inglés después de clases.',
+      tokens: ['English', 'can', 'school.', 'He', 'study', 'after'],
+      tip: 'He + can + study (sin -ies).',
     },
   ],
   4: [
@@ -427,38 +399,14 @@ export const sentenceBuildsByTopic: Record<number, SentenceBuildItem[]> = {
       tokens: ['buy', 'yesterday.', 'not', 'We', 'the', 'did', 'tickets'],
       tip: 'Did not + verbo base buy.',
     },
-  ],
-  5: [
     {
-      id: 'sb-5-1',
-      topicId: 5,
-      instruction: 'Coloca el adverbio de frecuencia correctamente:',
-      target: 'Our teacher is never late for class.',
-      spanish: 'Nuestro docente nunca llega tarde a clase.',
-      tokens: ['late', 'is', 'teacher', 'never', 'Our', 'class.', 'for'],
-      tip: 'Con el verbo be (is), never va después.',
-    },
-  ],
-  6: [
-    {
-      id: 'sb-6-1',
-      topicId: 6,
-      instruction: 'Ordena el plan futuro con going to:',
-      target: 'We are going to visit Arenal Volcano.',
-      spanish: 'Vamos a visitar el Volcán Arenal.',
-      tokens: ['visit', 'going', 'We', 'Arenal', 'to', 'are', 'Volcano.'],
-      tip: 'We + are going to + verbo base.',
-    },
-  ],
-  7: [
-    {
-      id: 'sb-7-1',
-      topicId: 7,
-      instruction: 'Ordena la oración en Past Continuous:',
-      target: 'The students were taking notes when it rained.',
-      spanish: 'Los estudiantes estaban tomando apuntes cuando llovió.',
-      tokens: ['taking', 'when', 'were', 'The', 'it', 'notes', 'students', 'rained.'],
-      tip: 'The students + were taking notes + when it rained.',
+      id: 'sb-4-2',
+      topicId: 4,
+      instruction: 'Forma la pregunta en Pasado Simple:',
+      target: 'Did she write a poem last week?',
+      spanish: '¿Escribió ella un poema la semana pasada?',
+      tokens: ['write', 'week?', 'she', 'poem', 'Did', 'a', 'last'],
+      tip: 'Did al inicio + sujeto + verbo base write.',
     },
   ],
 };

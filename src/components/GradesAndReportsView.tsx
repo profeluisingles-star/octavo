@@ -14,7 +14,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { topics } from '../data/curriculum';
 import { readingPassages } from '../data/readings';
-import type { AccessSession, GradeEvent, StudentState } from '../types';
+import type { GradeEvent, StudentState } from '../types';
 import {
   buildCsvContent,
   buildGmailHref,
@@ -45,12 +45,11 @@ interface ReportsPayload {
 
 interface GradesAndReportsViewProps {
   state: StudentState;
-  accessSession: AccessSession;
   quizLocked: boolean;
   onJumpToTopic: (topicId: number) => void;
 }
 
-export function GradesAndReportsView({ state, accessSession, quizLocked, onJumpToTopic }: GradesAndReportsViewProps) {
+export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: GradesAndReportsViewProps) {
   const [subView, setSubView] = useState<'student' | 'realtime'>('student');
   const [serverData, setServerData] = useState<ReportsPayload | null>(null);
   const [loading, setLoading] = useState(false);
@@ -458,7 +457,7 @@ export function GradesAndReportsView({ state, accessSession, quizLocked, onJumpT
       ) : (
         /* REAL-TIME TEACHER MANAGEMENT VIEW */
         <div className="space-y-6">
-          <TeacherControlPanel accessSession={accessSession} />
+          <TeacherControlPanel />
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#d4e4dd] bg-white p-4">
             <div className="flex flex-wrap items-center gap-3">

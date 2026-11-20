@@ -186,13 +186,6 @@ export interface StudentState {
   soundEffects: boolean;
 }
 
-export interface AccessSession {
-  token: string;
-  role: 'student' | 'teacher';
-  codeHint: string;
-  activatedAt: string;
-}
-
 export interface NotificationChannelStatus {
   teacherEmail: string;
   whatsappPhone: string;
@@ -206,6 +199,5 @@ export interface NotificationChannelStatus {
     callmebot: boolean;
   };
   webhookAutomatic: boolean;
-  activeStudentCodesCount: number;
 }
 

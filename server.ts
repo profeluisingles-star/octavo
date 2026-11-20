@@ -38,24 +38,6 @@ export interface GradeEvent {
 
 interface StorePayload {
   events: GradeEvent[];
-  customCodes?: string[];
-}
-
-function normalizeCode(code: unknown): string {
-  if (typeof code !== 'string') return '';
-  return code.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
-}
-
-function getConfiguredTeacherCode(): string {
-  return (process.env.TEACHER_ACCESS_CODE || 'MP-DOCENTE').trim();
-}
-
-function getEnvStudentCodes(): string[] {
-  const raw = (process.env.STUDENT_ACCESS_CODES || 'MP-EBA64').trim();
-  return raw
-    .split(',')
-    .map((c) => c.trim())
-    .filter(Boolean);
 }
 
 function ensureStore(): StorePayload {
@@ -64,7 +46,7 @@ function ensureStore(): StorePayload {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     if (!fs.existsSync(DATA_FILE)) {
-      const initial: StorePayload = { events: [], customCodes: [] };
+      const initial: StorePayload = { events: [] };
       fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf8');
       return initial;
     }
@@ -72,20 +54,16 @@ function ensureStore(): StorePayload {
     const parsed = JSON.parse(raw) as StorePayload;
     return {
       events: Array.isArray(parsed?.events) ? parsed.events : [],
-      customCodes: Array.isArray(parsed?.customCodes) ? parsed.customCodes : [],
     };
   } catch {
-    return { events: [], customCodes: [] };
+    return { events: [] };
   }
 }
 
 let memoryStore: StorePayload = ensureStore();
 
 function persistStore(next: StorePayload): void {
-  memoryStore = {
-    events: next.events,
-    customCodes: next.customCodes ?? memoryStore.customCodes ?? [],
-  };
+  memoryStore = { events: next.events };
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -94,20 +72,6 @@ function persistStore(next: StorePayload): void {
   } catch (err) {
     console.error('Could not persist records:', err);
   }
-}
-
-function getAllValidStudentCodes(): string[] {
-  const combined = [...getEnvStudentCodes(), ...(memoryStore.customCodes || [])];
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const c of combined) {
-    const norm = normalizeCode(c);
-    if (norm && !seen.has(norm)) {
-      seen.add(norm);
-      out.push(c.toUpperCase().trim());
-    }
-  }
-  return out;
 }
 
 function normalizeStudentName(name: unknown): string | null {
@@ -398,73 +362,6 @@ async function startServer() {
     res.json({ ok: true, count: memoryStore.events.length, timestamp: new Date().toISOString() });
   });
 
-  // --- Access Code Verification & Teacher Code Management ---
-  app.post('/api/access/verify', (req: Request, res: Response) => {
-    const input = normalizeCode((req.body as { code?: string })?.code);
-    if (!input) {
-      res.status(400).json({ ok: false, error: 'Escribe un código de acceso válido.' });
-      return;
-    }
-
-    const teacherNorm = normalizeCode(getConfiguredTeacherCode());
-    if (teacherNorm && input === teacherNorm) {
-      res.json({
-        ok: true,
-        role: 'teacher',
-        token: crypto.randomBytes(24).toString('hex'),
-        codeHint: getConfiguredTeacherCode().toUpperCase(),
-      });
-      return;
-    }
-
-    const validCodes = getAllValidStudentCodes();
-    const matched = validCodes.find((c) => normalizeCode(c) === input);
-    if (matched) {
-      res.json({
-        ok: true,
-        role: 'student',
-        token: crypto.randomBytes(24).toString('hex'),
-        codeHint: matched,
-      });
-      return;
-    }
-
-    res.status(401).json({
-      ok: false,
-      error: 'El código no coincide. Verifica los caracteres con Mr. Picado.',
-    });
-  });
-
-  app.post('/api/access/codes', (req: Request, res: Response) => {
-    const body = req.body as { teacherCode?: string; action?: 'list' | 'add' | 'remove'; code?: string };
-    const teacherNorm = normalizeCode(getConfiguredTeacherCode());
-    if (!body?.teacherCode || normalizeCode(body.teacherCode) !== teacherNorm) {
-      res.status(401).json({ ok: false, error: 'Código docente incorrecto.' });
-      return;
-    }
-
-    const action = body.action || 'list';
-    if (action === 'add' && body.code) {
-      const cleaned = body.code.toUpperCase().trim().slice(0, 32);
-      const norm = normalizeCode(cleaned);
-      if (norm.length >= 4 && !getAllValidStudentCodes().some((c) => normalizeCode(c) === norm)) {
-        const nextCustom = [...(memoryStore.customCodes || []), cleaned];
-        persistStore({ events: memoryStore.events, customCodes: nextCustom });
-      }
-    } else if (action === 'remove' && body.code) {
-      const norm = normalizeCode(body.code);
-      const nextCustom = (memoryStore.customCodes || []).filter((c) => normalizeCode(c) !== norm);
-      persistStore({ events: memoryStore.events, customCodes: nextCustom });
-    }
-
-    res.json({
-      ok: true,
-      envCodes: getEnvStudentCodes(),
-      customCodes: memoryStore.customCodes || [],
-      allCodes: getAllValidStudentCodes(),
-    });
-  });
-
   // --- Notification Channel Status & Live Test ---
   app.get('/api/notifications/status', (_req: Request, res: Response) => {
     const cfg = getNotificationConfig();
@@ -481,17 +378,10 @@ async function startServer() {
         callmebot: Boolean(cfg.callmebotApiKey),
       },
       webhookAutomatic: Boolean(cfg.notifyWebhookUrl),
-      activeStudentCodesCount: getAllValidStudentCodes().length,
     });
   });
 
-  app.post('/api/notifications/test', async (req: Request, res: Response) => {
-    const body = req.body as { teacherCode?: string };
-    const teacherNorm = normalizeCode(getConfiguredTeacherCode());
-    if (!body?.teacherCode || normalizeCode(body.teacherCode) !== teacherNorm) {
-      res.status(401).json({ ok: false, error: 'Código docente incorrecto para enviar pruebas.' });
-      return;
-    }
+  app.post('/api/notifications/test', async (_req: Request, res: Response) => {
 
     const sampleEvent: GradeEvent = {
       id: crypto.randomUUID(),

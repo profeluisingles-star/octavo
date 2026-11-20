@@ -2,23 +2,6 @@ import crypto from 'node:crypto';
 
 let transientEvents = [];
 
-function normalizeCode(code) {
-  if (typeof code !== 'string') return '';
-  return code.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
-}
-
-function getConfiguredTeacherCode() {
-  return (process.env.TEACHER_ACCESS_CODE || 'MP-DOCENTE').trim();
-}
-
-function getEnvStudentCodes() {
-  const raw = (process.env.STUDENT_ACCESS_CODES || 'MP-EBA64').trim();
-  return raw
-    .split(',')
-    .map((c) => c.trim())
-    .filter(Boolean);
-}
-
 function getNotificationConfig() {
   return {
     teacherEmail: (process.env.TEACHER_EMAIL || 'profeluisingles@gmail.com').trim(),
@@ -149,50 +132,6 @@ export const handler = async (event) => {
     };
   }
 
-  if (path.endsWith('/access/verify') && event.httpMethod === 'POST') {
-    try {
-      const body = JSON.parse(event.body || '{}');
-      const input = normalizeCode(body.code);
-      if (!input) {
-        return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Escribe un código válido.' }) };
-      }
-      const teacherNorm = normalizeCode(getConfiguredTeacherCode());
-      if (teacherNorm && input === teacherNorm) {
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({
-            ok: true,
-            role: 'teacher',
-            token: crypto.randomBytes(24).toString('hex'),
-            codeHint: getConfiguredTeacherCode().toUpperCase(),
-          }),
-        };
-      }
-      const studentCodes = getEnvStudentCodes();
-      const matched = studentCodes.find((c) => normalizeCode(c) === input);
-      if (matched) {
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({
-            ok: true,
-            role: 'student',
-            token: crypto.randomBytes(24).toString('hex'),
-            codeHint: matched,
-          }),
-        };
-      }
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ ok: false, error: 'El código no coincide. Verifica los caracteres con Mr. Picado.' }),
-      };
-    } catch {
-      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'JSON inválido.' }) };
-    }
-  }
-
   if (path.endsWith('/notifications/status') && event.httpMethod === 'GET') {
     const cfg = getNotificationConfig();
     return {
@@ -211,18 +150,12 @@ export const handler = async (event) => {
           callmebot: Boolean(cfg.callmebotApiKey),
         },
         webhookAutomatic: Boolean(cfg.notifyWebhookUrl),
-        activeStudentCodesCount: getEnvStudentCodes().length,
       }),
     };
   }
 
   if (path.endsWith('/notifications/test') && event.httpMethod === 'POST') {
     try {
-      const body = JSON.parse(event.body || '{}');
-      const teacherNorm = normalizeCode(getConfiguredTeacherCode());
-      if (!body.teacherCode || normalizeCode(body.teacherCode) !== teacherNorm) {
-        return { statusCode: 401, headers, body: JSON.stringify({ ok: false, error: 'Código docente incorrecto.' }) };
-      }
       const sample = {
         id: crypto.randomUUID(),
         timestamp: new Date().toISOString(),
@@ -256,7 +189,7 @@ export const handler = async (event) => {
         }),
       };
     } catch {
-      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'JSON inválido.' }) };
+      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Error procesando prueba.' }) };
     }
   }
 

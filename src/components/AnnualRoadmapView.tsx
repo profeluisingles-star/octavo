@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, CheckCircle2, Headphones, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, ClipboardCheck, Headphones, Sparkles } from 'lucide-react';
 import { costaRicaDays, topics } from '../data/curriculum';
 import { readingPassages } from '../data/readings';
 import type { StudentState } from '../types';
@@ -7,6 +7,7 @@ interface AnnualRoadmapViewProps {
   state: StudentState;
   onSelectTopic: (topicId: number, subTab?: 'study' | 'interactive' | 'audio' | 'practice' | 'quiz') => void;
   onGoToReadings: () => void;
+  onGoToExams?: () => void;
   onGoToReports: () => void;
 }
 
@@ -14,6 +15,7 @@ export function AnnualRoadmapView({
   state,
   onSelectTopic,
   onGoToReadings,
+  onGoToExams,
   onGoToReports,
 }: AnnualRoadmapViewProps) {
   const quizzesDone = Object.keys(state.quiz).length;
@@ -52,6 +54,16 @@ export function AnnualRoadmapView({
               <BookOpen className="h-4 w-4 text-[#17644e]" aria-hidden="true" />
               <span>{readingPassages.length} Lecturas Guiadas</span>
             </button>
+            {onGoToExams && (
+              <button
+                type="button"
+                onClick={onGoToExams}
+                className="inline-flex items-center gap-2 rounded-xl border border-[#17644e] bg-white px-4 py-2.5 text-sm font-bold text-[#17644e] hover:bg-[#f4f9f6]"
+              >
+                <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
+                <span>3 Exámenes Finales (86 pts)</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={onGoToReports}

@@ -21,7 +21,8 @@ export type GradeEventType =
   | 'Vocabulario'
   | 'Audio Lab'
   | 'Verbos'
-  | 'Flashcards';
+  | 'Flashcards'
+  | 'Examen Final';
 
 export interface GradeEvent {
   id: string;
@@ -92,6 +93,7 @@ const VALID_TYPES = new Set<string>([
   'Audio Lab',
   'Verbos',
   'Flashcards',
+  'Examen Final',
 ]);
 
 function formatCostaRicaStamp(iso: string): string {

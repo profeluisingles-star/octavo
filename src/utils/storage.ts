@@ -26,6 +26,8 @@ export function createInitialState(): StudentState {
     outbox: [],
     localHistory: [],
     soundEffects: true,
+    mockExams: {},
+    mockExamDrafts: {},
   };
 }
 
@@ -149,6 +151,14 @@ export function formatReportText(state: StudentState, topics: Topic[]): string {
       if (rec.comprehension) {
         lines.push(`• ${title} · Lectura: ${rec.comprehension.score}/${rec.comprehension.total}`);
       }
+    }
+  }
+
+  const mockEntries = Object.entries(state.mockExams || {});
+  if (mockEntries.length) {
+    lines.push('', '--- Exámenes Finales (Simulacros) ---');
+    for (const [examId, rec] of mockEntries) {
+      lines.push(`• ${examId}: ${rec.score}/${rec.total} (${rec.bestPct}%)`);
     }
   }
 

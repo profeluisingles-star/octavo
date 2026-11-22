@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { topics } from '../data/curriculum';
+import { finalExams } from '../data/finalExams';
 import { readingPassages } from '../data/readings';
 import type { GradeEvent, StudentState } from '../types';
 import {
@@ -446,6 +447,52 @@ export function GradesAndReportsView({ state, quizLocked, onJumpToTopic }: Grade
                       </td>
                       <td className="px-3.5 py-2 font-mono-num font-bold text-[#17644e]">
                         {rec?.comprehension ? `${rec.comprehension.score}/${rec.comprehension.total}` : '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </section>
+
+          {/* Final Exams Summary Table */}
+          <section className="overflow-x-auto rounded-xl border border-[#d4e4dd] bg-white">
+            <table className="w-full text-left text-sm border-collapse">
+              <caption className="px-4 py-3 text-left font-extrabold text-[#102a24] bg-[#f4f9f6] border-b border-[#d4e4dd]">
+                Registro de Exámenes Finales (Simulacros 1–3 · Estilo Oficial)
+              </caption>
+              <thead>
+                <tr className="bg-[#e6f4ee] text-[#102a24]">
+                  <th className="px-3.5 py-2.5 font-bold">Simulacro</th>
+                  <th className="px-3.5 py-2.5 font-bold">Origen</th>
+                  <th className="px-3.5 py-2.5 font-bold">Mejor Puntaje</th>
+                  <th className="px-3.5 py-2.5 font-bold">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e6efeb]">
+                {finalExams.map((exam) => {
+                  const rec = state.mockExams?.[exam.id];
+                  const passed = rec && rec.bestPct >= 70;
+                  return (
+                    <tr key={exam.id} className="hover:bg-[#f8fbfa]">
+                      <td className="px-3.5 py-2.5 font-semibold text-[#102a24]">{exam.title}</td>
+                      <td className="px-3.5 py-2.5 text-xs text-[#435b53]">{exam.sourceBadge}</td>
+                      <td className="px-3.5 py-2.5 font-mono-num font-bold text-[#17644e]">
+                        {rec ? `${rec.score}/${rec.total} (${rec.bestPct}%)` : '—'}
+                      </td>
+                      <td className="px-3.5 py-2.5">
+                        <span
+                          className={`inline-flex items-center gap-1 text-xs font-bold ${
+                            passed ? 'text-[#17644e]' : rec ? 'text-amber-700' : 'text-[#647d75]'
+                          }`}
+                        >
+                          {passed ? (
+                            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                          ) : (
+                            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                          )}
+                          <span>{passed ? 'Aprobado' : rec ? 'En progreso' : 'Pendiente'}</span>
+                        </span>
                       </td>
                     </tr>
                   );

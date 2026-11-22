@@ -152,7 +152,8 @@ export type GradeEventType =
   | 'Vocabulario'
   | 'Audio Lab'
   | 'Verbos'
-  | 'Flashcards';
+  | 'Flashcards'
+  | 'Examen Final';
 
 export interface GradeEvent {
   id: string;
@@ -184,6 +185,8 @@ export interface StudentState {
   outbox: GradeEvent[];
   localHistory: GradeEvent[];
   soundEffects: boolean;
+  mockExams?: Record<string, { score: number; total: number; bestPct: number; completedAt: string }>;
+  mockExamDrafts?: Record<string, Record<string, string>>;
 }
 
 export interface NotificationChannelStatus {

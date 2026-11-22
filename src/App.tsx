@@ -2,6 +2,7 @@ import {
   BarChart3,
   BookOpen,
   CheckCircle2,
+  ClipboardCheck,
   Compass,
   ExternalLink,
   Headphones,
@@ -16,6 +17,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnnualRoadmapView } from './components/AnnualRoadmapView';
 import { AssessmentView } from './components/AssessmentView';
+import { FinalExamsView } from './components/FinalExamsView';
 import { GradesAndReportsView } from './components/GradesAndReportsView';
 import { InteractivePracticeView } from './components/InteractivePracticeView';
 import { ReadingsView } from './components/ReadingsView';
@@ -42,7 +44,7 @@ import {
   VISIT_SESSION_KEY,
 } from './utils/storage';
 
-type PrimaryView = 'roadmap' | 'topics' | 'readings' | 'reports';
+type PrimaryView = 'roadmap' | 'topics' | 'readings' | 'exams' | 'reports';
 type TopicTab = 'study' | 'verbs' | 'interactive' | 'audio' | 'practice' | 'quiz';
 
 export default function App() {
@@ -369,7 +371,8 @@ export default function App() {
               { id: 'roadmap' as const, label: 'Temario', icon: Compass },
               { id: 'topics' as const, label: 'Estudio', icon: Sparkles },
               { id: 'readings' as const, label: 'Lecturas', icon: BookOpen },
-              { id: 'reports' as const, label: 'Notas y Reportes', icon: BarChart3 },
+              { id: 'exams' as const, label: 'Exámenes', icon: ClipboardCheck },
+              { id: 'reports' as const, label: 'Notas', icon: BarChart3 },
             ].map((item) => {
               const Icon = item.icon;
               const active = view === item.id;
@@ -410,12 +413,16 @@ export default function App() {
             { id: 'roadmap' as const, label: 'Temario' },
             { id: 'topics' as const, label: 'Estudio' },
             { id: 'readings' as const, label: 'Lecturas' },
+            { id: 'exams' as const, label: 'Exámenes' },
             { id: 'reports' as const, label: 'Notas' },
           ].map((item) => (
             <button
               key={item.id}
               type="button"
-              onClick={() => setView(item.id)}
+              onClick={() => {
+                stopSpeech();
+                setView(item.id);
+              }}
               className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap shrink-0 ${
                 view === item.id ? 'bg-[#17644e] text-white' : 'text-[#d1eae0] bg-[#143a31]'
               }`}
@@ -530,6 +537,7 @@ export default function App() {
               state={state}
               onSelectTopic={(id, sub) => selectTopic(id, sub || 'study')}
               onGoToReadings={() => setView('readings')}
+              onGoToExams={() => setView('exams')}
               onGoToReports={() => setView('reports')}
             />
           ) : view === 'readings' ? (
@@ -552,6 +560,42 @@ export default function App() {
                   recordActivity(kind, title, score, total);
                 }}
                 onBackToTopics={() => setView('topics')}
+              />
+            </section>
+          ) : view === 'exams' ? (
+            <section className="rounded-2xl border border-[#d4e4dd] bg-white p-5 sm:p-7">
+              <FinalExamsView
+                state={state}
+                onUpdateDraft={(examId, answers) =>
+                  persist((prev) => ({
+                    ...prev,
+                    mockExamDrafts: {
+                      ...(prev.mockExamDrafts || {}),
+                      [examId]: answers,
+                    },
+                  }))
+                }
+                onSaveExamResult={(examId, examTitle, score, total) => {
+                  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+                  persist((prev) => {
+                    const current = prev.mockExams?.[examId];
+                    const bestScore = current ? Math.max(current.score, score) : score;
+                    const bestPct = current ? Math.max(current.bestPct, pct) : pct;
+                    return {
+                      ...prev,
+                      mockExams: {
+                        ...(prev.mockExams || {}),
+                        [examId]: {
+                          score: bestScore,
+                          total,
+                          bestPct,
+                          completedAt: new Date().toISOString(),
+                        },
+                      },
+                    };
+                  });
+                  recordActivity('Examen Final', examTitle, score, total);
+                }}
               />
             </section>
           ) : view === 'reports' ? (
@@ -646,6 +690,21 @@ export default function App() {
                       <span>Audio Lab Rápido</span>
                     </span>
                     <span className="font-mono-num text-[#17644e]">U{topicIdx + 1}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      stopSpeech();
+                      setView('exams');
+                    }}
+                    className="w-full inline-flex items-center justify-between rounded-xl border border-[#17644e] bg-[#eef7f3] px-3 py-2 text-xs font-bold text-[#17644e] hover:bg-[#e1f1ea]"
+                  >
+                    <span className="inline-flex items-center gap-1.5">
+                      <ClipboardCheck className="h-3.5 w-3.5 text-[#17644e]" aria-hidden="true" />
+                      <span>Exámenes Finales</span>
+                    </span>
+                    <span className="font-mono-num text-[#17644e]">3</span>
                   </button>
                 </div>
               </aside>
